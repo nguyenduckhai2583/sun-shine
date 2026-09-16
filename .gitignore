@@ -26,12 +26,14 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
+.dart_skills/
 .dart_tool/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
 /coverage/
+pubspec.lock
 
 # Symbolication related
 app.*.symbols
@@ -47,7 +49,13 @@ app.*.map.json
 # FVM
 .fvm/
 
+# Claude Code
+.claude/
+
 # Multi-environment: generated / secret build inputs
 ios/Flutter/Define.xcconfig
 android/signin.properties
 android/app/*.jks
+
+# Widget Preview related
+.widget_preview/
