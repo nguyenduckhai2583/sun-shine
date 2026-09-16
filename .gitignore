@@ -46,3 +46,8 @@ app.*.map.json
 
 # FVM
 .fvm/
+
+# Multi-environment: generated / secret build inputs
+ios/Flutter/Define.xcconfig
+android/signin.properties
+android/app/*.jks
