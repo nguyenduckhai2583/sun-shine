@@ -8,9 +8,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:sun_shine/config/build_config.dart';
 import 'package:sun_shine/main.dart';
 
 void main() {
+  // MyApp reads BuildConfig, which main() normally initialises.
+  setUpAll(() => BuildConfig().setupEnvironment());
+
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'config/build_config.dart';
+
 void main() {
+  BuildConfig().setupEnvironment();
   runApp(const MyApp());
 }
 
@@ -11,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: BuildConfig().appName,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: BuildConfig().appName),
     );
   }
 }
@@ -109,6 +112,11 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            const SizedBox(height: 24),
+            Text('env: ${BuildConfig().env.name}'),
+            Text('suffix: "${BuildConfig().appSuffix}"'),
+            Text('api: ${BuildConfig().env.baseApiUrl}'),
+            Text('debug: ${BuildConfig().isDebug}'),
           ],
         ),
       ),

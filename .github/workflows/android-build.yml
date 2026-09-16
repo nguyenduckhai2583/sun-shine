@@ -1,0 +1,113 @@
+name: Android Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run'
+        type: environment
+        required: true
+      buildType:
+        description: 'Build type'
+        type: choice
+        default: release
+        options: [debug, release]
+      deployTo:
+        description: 'Only deploy to Google Play when building the production bundle id'
+        type: choice
+        default: Firebase
+        options: [Firebase, GooglePlay]
+      message:
+        description: 'Release note'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Selects which environment's secrets `secrets.*` resolves to.
+    environment: ${{ inputs.environment }}
+    env:
+      KEYSTORE_BASE64: ${{ secrets.BASE_64_SIGNING_KEY }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.35.7'
+
+      - name: Prepare keystore
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+          {
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=keystore.jks"
+          } > android/signin.properties
+
+      - name: Build APK
+        if: ${{ inputs.deployTo == 'Firebase' }}
+        run: |
+          flutter pub get
+          flutter build apk --${{ inputs.buildType }} \
+            --dart-define-from-file=_env/${{ inputs.environment }}.env
+
+      - name: Build AppBundle
+        if: ${{ inputs.deployTo == 'GooglePlay' }}
+        run: |
+          flutter pub get
+          flutter build appbundle --${{ inputs.buildType }} \
+            --dart-define-from-file=_env/${{ inputs.environment }}.env
+
+      - name: Upload apk artifact
+        if: ${{ inputs.deployTo == 'Firebase' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-${{ inputs.buildType }}.apk
+
+      - name: Upload aab artifact
+        if: ${{ inputs.deployTo == 'GooglePlay' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: build/app/outputs/bundle/${{ inputs.buildType }}/app-${{ inputs.buildType }}.aab
+
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    # Each job is a fresh runner and does not inherit the secret scope.
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-release
+
+      - name: Upload to Firebase App Distribution
+        if: ${{ inputs.deployTo == 'Firebase' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: '${{ secrets.FIREBASE_APP_ID_ANDROID }}'
+          serviceCredentialsFileContent: '${{ secrets.FIREBASE_APP_CREDENTIALS }}'
+          groups: Devs
+          file: 'app-${{ inputs.buildType }}.apk'
+          releaseNotes: '${{ inputs.message }}'
+
+      - name: Upload to Google Play
+        if: ${{ inputs.deployTo == 'GooglePlay' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: '${{ secrets.SERVICE_ACCOUNT_JSON }}'
+          packageName: com.sunshine.sunshine
+          releaseFiles: 'app-${{ inputs.buildType }}.aab'
+          track: internal
+          status: draft

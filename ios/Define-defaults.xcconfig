@@ -1,0 +1,6 @@
+// Fallback values used until the scheme pre-action generates Flutter/Define.xcconfig
+// (first build, or a build started without --dart-define-from-file).
+APP_NAME=Sun Shine
+APP_SUFFIX=
+APP_VERSION=1.0.0
+APP_VERSION_CODE=1
