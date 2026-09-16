@@ -1,9 +1,5 @@
 import 'env.dart';
 
-/// Reads the values injected by `--dart-define-from-file=_env/<env>.env`.
-///
-/// `String.fromEnvironment` must be `const` and its key must be a literal, so
-/// every lookup is spelled out below rather than driven by a loop.
 class BuildConfig {
   factory BuildConfig() => _instance;
 
@@ -18,7 +14,6 @@ class BuildConfig {
   late final String appVersionCode;
   late final Env env;
 
-  /// Call once from `main()` before `runApp`.
   void setupEnvironment() {
     isDebug =
         const String.fromEnvironment('APP_IS_DEBUG', defaultValue: 'n') == 'y';
@@ -36,10 +31,7 @@ class BuildConfig {
       defaultValue: '1',
     );
     env = Env.fromName(
-      const String.fromEnvironment(
-        'APP_ENVIRONMENT_TYPE',
-        defaultValue: 'dev',
-      ),
+      const String.fromEnvironment('APP_ENVIRONMENT_TYPE', defaultValue: 'dev'),
     );
   }
 }

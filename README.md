@@ -1,16 +1,29 @@
 # sun_shine
 
-A new Flutter project.
+## Getting started
 
-## Getting Started
+```bash
+fvm install            # Flutter 3.47.4, pinned in .fvmrc
+fvm flutter pub get
+fvm dart run build_runner build   # only after editing a freezed model
+fvm flutter run --dart-define-from-file=_env/dev.env
+```
 
-This project is a starting point for a Flutter application.
+Builds go through the wrapper, which picks the right `_env/<env>.env`:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+./_buildScripts/app_build.sh -env dev -platform apk -mode debug
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Docs
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [docs/architecture.md](docs/architecture.md) — layers, state management,
+  testing, and how this maps to the Flutter team's recommendations
+- [docs/routing.md](docs/routing.md) — how `go_router` is wired up
+
+## Checks
+
+```bash
+fvm flutter analyze
+fvm flutter test
+```

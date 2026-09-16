@@ -1,0 +1,10 @@
+import 'package:provider/single_child_widget.dart';
+import 'package:sun_shine/core.dart';
+
+List<SingleChildWidget> get signInProviders {
+  return [
+    ChangeNotifierProvider(
+      create: (context) => SignInViewModel(authRepository: context.read()),
+    ),
+  ];
+}

@@ -1,0 +1,26 @@
+import 'package:material_ui/material_ui.dart';
+import 'package:sun_shine/core.dart';
+
+class AuthScope extends StatelessWidget {
+  const AuthScope({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final authRepository = context.read<AuthRepository>();
+
+    return StreamBuilder<Session?>(
+      stream: authRepository.session,
+      initialData: authRepository.currentSession,
+      builder: (context, snapshot) {
+        final userId = snapshot.data?.userId ?? '_anonymous';
+        return MultiProvider(
+          key: ValueKey(userId),
+          providers: appProviders,
+          child: child,
+        );
+      },
+    );
+  }
+}
