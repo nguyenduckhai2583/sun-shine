@@ -8,14 +8,23 @@ class MoreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return TabScaffold(
       tab: HomeTab.more,
-      body: PlaceholderTab(
-        icon: Icons.more_horiz,
-        title: 'More',
-        message: 'Settings and everything else goes here.',
-        action: FilledButton.tonal(
-          onPressed: () => context.push(Routes.moreSettings),
-          child: const Text('Open Settings (nested demo)'),
-        ),
+      body: ListView(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.dashboard_outlined),
+            title: const Text('Planix'),
+            subtitle: const Text('Projects and tasks'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.planix),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: const Text('Settings'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.moreSettings),
+          ),
+        ],
       ),
     );
   }

@@ -53,7 +53,13 @@ class _ChannelDetailViewState extends State<_ChannelDetailView> {
 
     final name = await showDialog<String>(
       context: context,
-      builder: (context) => RenameChannelDialog(initialName: channel.name),
+      builder: (context) => RenameDialog(
+        title: 'Rename channel',
+        label: 'Name',
+        prefixText: '#',
+        allowSpaces: false,
+        initialValue: channel.name,
+      ),
     );
     if (name == null) return;
 

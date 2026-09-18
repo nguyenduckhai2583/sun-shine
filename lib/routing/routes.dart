@@ -11,6 +11,12 @@ abstract final class Routes {
 
   static const channelDetailRelative = ':channelId';
 
+  static const planix = '/planix';
+
+  static const planixProjectRelative = ':projectId';
+
+  static String planixProject(String projectId) => '$planix/$projectId';
+
   static const moreSettingsRelative = 'settings';
 
   static const moreSettings = '$more/settings';

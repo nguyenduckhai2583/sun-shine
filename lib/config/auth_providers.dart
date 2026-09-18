@@ -3,13 +3,13 @@ import 'package:sun_shine/core.dart';
 
 List<SingleChildWidget> get authProviders {
   return [
-    Provider(create: (context) => AuthApiClient()),
-    Provider(
-      create: (context) => AuthLocalService(),
-      dispose: (context, service) => service.dispose(),
+    trackedProvider((context) => AuthApiClient()),
+    trackedProvider(
+      (context) => AuthLocalService(),
+      dispose: (service) => service.dispose(),
     ),
-    Provider<AuthRepository>(
-      create: (context) => AuthRepositoryRemote(
+    trackedProvider<AuthRepository>(
+      (context) => AuthRepositoryRemote(
         apiClient: context.read(),
         localService: context.read(),
       ),

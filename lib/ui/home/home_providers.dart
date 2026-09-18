@@ -3,12 +3,12 @@ import 'package:sun_shine/core.dart';
 
 List<SingleChildWidget> get homeProviders {
   return [
-    Provider(create: (context) => WorkspaceApiClient()),
-    Provider<WorkspaceRepository>(
-      create: (context) => WorkspaceRepositoryRemote(apiClient: context.read()),
+    trackedProvider((context) => WorkspaceApiClient()),
+    trackedProvider<WorkspaceRepository>(
+      (context) => WorkspaceRepositoryRemote(apiClient: context.read()),
     ),
-    ChangeNotifierProvider(
-      create: (context) => HomeViewModel(workspaceRepository: context.read()),
+    trackedViewModel(
+      (context) => HomeViewModel(workspaceRepository: context.read()),
     ),
   ];
 }

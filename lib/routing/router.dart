@@ -32,6 +32,31 @@ GoRouter createRouter({
         path: Routes.signIn,
         pageBuilder: (context, state) => _page(state, const SignInScreen()),
       ),
+      // Nested GoRoutes are sibling pages on one navigator, not parent/child
+      // widgets, so a provider inside /planix is invisible to /planix/:id. The
+      // shell is the only ancestor both reach; popping it disposes the scope.
+      ShellRoute(
+        builder: (context, state, child) =>
+            MultiProvider(providers: planixModuleProviders, child: child),
+        routes: [
+          GoRoute(
+            path: Routes.planix,
+            pageBuilder: (context, state) =>
+                _page(state, const PlanixProjectsScreen()),
+            routes: [
+              GoRoute(
+                path: Routes.planixProjectRelative,
+                pageBuilder: (context, state) => _page(
+                  state,
+                  PlanixProjectDetailScreen(
+                    projectId: state.pathParameters['projectId']!,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, navigationShell) =>
             _page(state, HomeScreen(navigationShell: navigationShell)),

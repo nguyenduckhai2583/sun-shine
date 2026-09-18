@@ -88,7 +88,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Name cannot be empty'), findsOneWidget);
-      expect(find.byType(RenameChannelDialog), findsOneWidget);
+      expect(find.byType(RenameDialog), findsOneWidget);
     });
 
     testWidgets('rejects a name with spaces', (tester) async {

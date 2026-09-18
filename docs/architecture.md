@@ -81,6 +81,85 @@ This is the shape used by the apps surveyed for this decision:
 
 None of them make the repository itself a `Listenable`.
 
+### Module scopes, and why planix uses `ShellRoute`
+
+Planix opens full-screen from the More tab and spans two routes — `/planix` and
+`/planix/:projectId` — that must share one `ProjectLocalService`.
+
+Nesting them under `routes:` looks like it should be enough. It is not. Every
+`GoRoute` produces its own `Page`, and a `Navigator` holds pages in a stack, so
+nested routes are **sibling pages, not parent and child widgets**. Printing the
+ancestor chain of a detail screen shows the parent list screen is absent:
+
+```
+Navigator                                    <- directly above the detail page
+_InheritedProviderScope<ChannelRepository?>  <- data layer, above the navigator
+AuthScope
+...
+ChannelsScreen in the ancestor chain? false
+```
+
+`context.read<T>()` walks *up the element tree*, so it can never reach sideways
+into a sibling page. Nesting `routes:` buys a nested URL and the right stack
+order — never a shared ancestor.
+
+That leaves exactly two places a module's data layer can live: above the root
+navigator (`appProviders`), or inside a shell. `ShellRoute` is the only
+go_router construct that makes one widget a real ancestor of several routes,
+because its builder receives the nested `Navigator` as `child`:
+
+```dart
+ShellRoute(
+  builder: (context, state, child) =>
+      MultiProvider(providers: planixModuleProviders, child: child),
+  routes: [
+    GoRoute(
+      path: Routes.planix,
+      routes: [GoRoute(path: Routes.planixProjectRelative, ...)],
+    ),
+  ],
+)
+```
+
+The scope is disposed by the framework when the module is popped — no
+per-module cleanup line to remember.
+
+This replaces an earlier flat-route shape that kept `planixModuleProviders` in
+`appProviders` and cleared it by hand:
+
+```dart
+onExit: (context, state) {
+  context.read<ProjectRepository>().invalidateCache();
+  return true;
+}
+```
+
+That worked, but it leaked module state into the session scope and cost a line
+per module. It also could not survive moving the providers onto the route:
+go_router hands `onExit` the **root navigator's** context
+(`delegate.dart`, `_callOnExitStartsAt(context: navigatorContext)`), which sits
+above any page-level provider, so the `read` stops resolving.
+
+The one cost is real: `ShellRoute` always builds a nested `Navigator`, so
+`/planix` is the first route in it, `Navigator.canPop` is false, and `AppBar`
+does not imply a back button on the **entry page only** — the detail page still
+gets one automatically. The fix is one line, and `context.pop()` is the plain
+go_router idiom, not a hand-wired root-navigator call, because
+`_findCurrentNavigators()` returns `[shell, root]` and pops the first navigator
+that can:
+
+```dart
+AppBar(leading: BackButton(onPressed: () => context.pop()), ...)
+```
+
+This is the same conclusion the ecosystem reached. `go_provider` exists purely
+to fill this gap, and its `GoProviderRoute` is a `ShellRoute` subclass wrapping
+`Nested` (what `MultiProvider` extends) — it even ships a `GoPopButton` whose
+`onPressed` defaults to `context.pop`, for exactly this entry-page case.
+go_router's own proposal to scope providers to paths
+([csells/go_router#185](https://github.com/csells/go_router/issues/185)) was
+never resolved before the repo was archived.
+
 ### Clearing data on sign-out
 
 Two scopes, nested:
@@ -135,6 +214,43 @@ There is deliberately no `refreshListenable`: `AuthScope` re-keys on every
 session change, which rebuilds `MainApp` and therefore the router. Adding a
 refresh listener as well would make the same transition fire twice.
 
+### Instance lifecycle logging
+
+Every ViewModel, repository, local service and API client is registered through
+one of two helpers in `lib/utils/tracked_providers.dart`, so creation and
+disposal are logged from a single place:
+
+```dart
+trackedProvider((context) => ChannelApiClient()),
+trackedProvider(
+  (context) => ChannelLocalService(),
+  dispose: (service) => service.dispose(),
+),
+trackedViewModel((context) => ChannelsViewModel(channelRepository: context.read())),
+```
+
+Output is one line per event, with the identity hash so the same instance can be
+matched across create and dispose:
+
+```
+[di] + ChannelLocalService#1f3a2b
+[di] - ChannelLocalService#1f3a2b
+```
+
+`DiLog.enabled` defaults to `kDebugMode` and `main.dart` sets it from
+`BuildConfig().isDebug`. `DiLog.output` swaps the sink — leave it null for
+`debugPrint`, or point it at a real logger.
+
+`trackedViewModel` returns a `ListenableProvider` rather than a
+`ChangeNotifierProvider`: the latter disposes internally with no hook, so there
+is no way to log it. `ListenableProvider` takes a `dispose` callback, and
+listening behaviour is identical — `ChangeNotifierProvider` only adds the
+automatic dispose that the helper now performs itself.
+
+Nothing else needs a per-class change. Framework objects such as
+`ScrollController` are deliberately not covered; `FlutterMemoryAllocations`
+would catch those too, but the noise swamps the four layers worth watching.
+
 ### Dependency scopes
 
 There is no root `MultiProvider`. Each screen that needs dependencies mounts its
@@ -147,9 +263,13 @@ own scope and delegates to a private view:
 | home | `HomeScreen` | `WorkspaceApiClient`, `WorkspaceRepository`, `HomeViewModel` |
 | channels | `ChannelsScreen` | `ChannelsViewModel` |
 | channel detail | `ChannelDetailScreen` | `ChannelDetailViewModel` |
+| planix module | `ShellRoute` in `router.dart` | `ProjectApiClient`, `ProjectLocalService`, `ProjectRepository` |
+| planix projects | `PlanixProjectsScreen` | `PlanixProjectsViewModel` |
+| planix detail | `PlanixProjectDetailScreen` | `PlanixProjectDetailViewModel` |
 
-Data that several screens must agree on lives at the root; view models stay
-per-screen. `appProviders` composes feature-owned lists (`channelDataProviders`)
+Data that several screens must agree on lives above them — at the session
+root when the whole app needs it, or in a module `ShellRoute` when only one
+feature does; view models stay per-screen. `appProviders` composes feature-owned lists (`channelDataProviders`)
 rather than listing every dependency itself, so it stays one line per feature.
 
 A provider list is a plain function, so a scope that depends on route

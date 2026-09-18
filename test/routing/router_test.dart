@@ -25,7 +25,7 @@ void main() {
 
       await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Open Settings (nested demo)'));
+      await tester.tap(find.widgetWithText(ListTile, 'Settings'));
       await tester.pumpAndSettle();
 
       final route = routeOf(tester, find.byType(MoreSettingsScreen));

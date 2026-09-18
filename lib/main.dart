@@ -4,6 +4,7 @@ import 'package:sun_shine/core.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   BuildConfig().setupEnvironment();
+  DiLog.enabled = BuildConfig().isDebug;
   runApp(
     MultiProvider(
       providers: authProviders,

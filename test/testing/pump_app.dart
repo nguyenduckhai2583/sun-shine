@@ -11,34 +11,31 @@ Future<AuthRepository> pumpApp(
   String? initialLocation,
   bool signedIn = true,
 }) async {
-  final apiClient = AuthApiClient();
-  final localService = AuthLocalService();
-  addTearDown(localService.dispose);
-  final authRepository = AuthRepositoryRemote(
-    apiClient: apiClient,
-    localService: localService,
-  );
-
-  if (signedIn) {
-    await authRepository.signIn('khai@sunshine.com', 'password');
-  }
+  late AuthRepository authRepository;
 
   await tester.pumpWidget(
     MultiProvider(
-      providers: [
-        Provider<AuthApiClient>.value(value: apiClient),
-        Provider<AuthLocalService>.value(value: localService),
-        Provider<AuthRepository>.value(value: authRepository),
-      ],
-      child: AuthScope(
-        child: _TestApp(
-          authRepository: authRepository,
-          initialLocation: initialLocation ?? Routes.home,
-        ),
+      providers: authProviders,
+      child: Builder(
+        builder: (context) {
+          authRepository = context.read<AuthRepository>();
+          return AuthScope(
+            child: _TestApp(
+              authRepository: authRepository,
+              initialLocation: initialLocation ?? Routes.home,
+            ),
+          );
+        },
       ),
     ),
   );
   await tester.pumpAndSettle();
+
+  if (signedIn) {
+    await authRepository.signIn('khai@sunshine.com', 'password');
+    await tester.pumpAndSettle();
+  }
+
   return authRepository;
 }
 

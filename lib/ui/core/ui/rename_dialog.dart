@@ -1,16 +1,27 @@
 import 'package:material_ui/material_ui.dart';
 
-class RenameChannelDialog extends StatefulWidget {
-  const RenameChannelDialog({super.key, required this.initialName});
+class RenameDialog extends StatefulWidget {
+  const RenameDialog({
+    super.key,
+    required this.title,
+    required this.label,
+    required this.initialValue,
+    this.prefixText,
+    this.allowSpaces = true,
+  });
 
-  final String initialName;
+  final String title;
+  final String label;
+  final String initialValue;
+  final String? prefixText;
+  final bool allowSpaces;
 
   @override
-  State<RenameChannelDialog> createState() => _RenameChannelDialogState();
+  State<RenameDialog> createState() => _RenameDialogState();
 }
 
-class _RenameChannelDialogState extends State<RenameChannelDialog> {
-  late final _controller = TextEditingController(text: widget.initialName);
+class _RenameDialogState extends State<RenameDialog> {
+  late final _controller = TextEditingController(text: widget.initialValue);
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -22,7 +33,9 @@ class _RenameChannelDialogState extends State<RenameChannelDialog> {
   String? _validate(String? value) {
     final name = value?.trim() ?? '';
     if (name.isEmpty) return 'Name cannot be empty';
-    if (name.contains(' ')) return 'Name cannot contain spaces';
+    if (!widget.allowSpaces && name.contains(' ')) {
+      return 'Name cannot contain spaces';
+    }
     return null;
   }
 
@@ -35,13 +48,16 @@ class _RenameChannelDialogState extends State<RenameChannelDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Rename channel'),
+      title: Text(widget.title),
       content: Form(
         key: _formKey,
         child: TextFormField(
           controller: _controller,
           autofocus: true,
-          decoration: const InputDecoration(prefixText: '#', labelText: 'Name'),
+          decoration: InputDecoration(
+            prefixText: widget.prefixText,
+            labelText: widget.label,
+          ),
           validator: _validate,
           onFieldSubmitted: (_) => _submit(),
         ),

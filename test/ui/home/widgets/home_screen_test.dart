@@ -19,10 +19,7 @@ void main() {
       await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Settings and everything else goes here.'),
-        findsOneWidget,
-      );
+      expect(find.byType(MoreScreen), findsOneWidget);
       expect(find.byType(ChannelsScreen), findsNothing);
     });
 
@@ -74,7 +71,7 @@ void main() {
     Future<void> openSettings(WidgetTester tester) async {
       await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Open Settings (nested demo)'));
+      await tester.tap(find.widgetWithText(ListTile, 'Settings'));
       await tester.pumpAndSettle();
     }
 
@@ -120,10 +117,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(MoreSettingsScreen), findsNothing);
-      expect(
-        find.text('Settings and everything else goes here.'),
-        findsOneWidget,
-      );
+      expect(find.byType(MoreScreen), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
     });
 

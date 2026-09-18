@@ -3,8 +3,8 @@ import 'package:sun_shine/core.dart';
 
 List<SingleChildWidget> get signInProviders {
   return [
-    ChangeNotifierProvider(
-      create: (context) => SignInViewModel(authRepository: context.read()),
+    trackedViewModel(
+      (context) => SignInViewModel(authRepository: context.read()),
     ),
   ];
 }
