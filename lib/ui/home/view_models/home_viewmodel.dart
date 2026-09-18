@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:sun_shine/core.dart';
 
-class HomeViewModel extends ChangeNotifier {
+class HomeViewModel extends BaseViewModel {
   HomeViewModel({required WorkspaceRepository workspaceRepository})
     : _workspaceRepository = workspaceRepository {
     load = Command0(_load)..execute();

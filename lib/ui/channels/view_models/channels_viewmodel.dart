@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:sun_shine/core.dart';
 
-class ChannelsViewModel extends ChangeNotifier {
+class ChannelsViewModel extends BaseViewModel {
   ChannelsViewModel({required ChannelRepository channelRepository})
     : _channelRepository = channelRepository {
     _subscription = _channelRepository.channels.listen(_onChannels);

@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:sun_shine/core.dart';
 
-class PlanixProjectDetailViewModel extends ChangeNotifier {
+class PlanixProjectDetailViewModel extends BaseViewModel {
   PlanixProjectDetailViewModel({
     required String projectId,
     required ProjectRepository projectRepository,

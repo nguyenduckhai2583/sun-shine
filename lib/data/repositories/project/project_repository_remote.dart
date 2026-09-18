@@ -1,6 +1,6 @@
 import 'package:sun_shine/core.dart';
 
-class ProjectRepositoryRemote implements ProjectRepository {
+class ProjectRepositoryRemote extends BaseRepo implements ProjectRepository {
   ProjectRepositoryRemote({
     required ProjectApiClient apiClient,
     required ProjectLocalService localService,

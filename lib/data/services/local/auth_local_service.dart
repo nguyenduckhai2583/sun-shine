@@ -1,7 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:sun_shine/core.dart';
 
-class AuthLocalService {
+class AuthLocalService extends BaseLocalService {
   final _session = BehaviorSubject<Session?>.seeded(null);
 
   Stream<Session?> get session => _session.stream.distinct();
@@ -20,7 +20,9 @@ class AuthLocalService {
 
   bool get isDisposed => _session.isClosed;
 
+  @override
   void dispose() {
     _session.close();
+    super.dispose();
   }
 }

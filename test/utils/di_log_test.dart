@@ -10,17 +10,23 @@ void main() {
 
   setUp(() {
     logs = [];
+    Di.observer = const DiLog();
     DiLog.enabled = true;
     DiLog.output = logs.add;
   });
 
   tearDown(() {
+    Di.observer = const DiObserver.silent();
     DiLog.output = null;
     DiLog.enabled = kDebugMode;
   });
 
   List<String> eventsFor(String type) =>
-      logs.where((l) => l.contains(' $type#')).toList();
+      logs.where((l) => l.startsWith('[di] $type ')).toList();
+
+  // '[di] ChannelLocalService created' -> 'ChannelLocalService'
+  String typeOf(String line) =>
+      line.replaceFirst('[di] ', '').split(' ').first;
 
   testWidgets('every layer logs on creation', (tester) async {
     await pumpApp(tester);
@@ -40,7 +46,7 @@ void main() {
       expect(eventsFor(type), hasLength(1), reason: '$type was not logged');
     }
 
-    expect(logs.first, matches(RegExp(r'^\[di\] \+ \w+#[0-9a-f]+$')));
+    expect(logs.first, matches(RegExp(r'^\[di\] \w+ created$')));
   });
 
   testWidgets('a module logs create then dispose across its lifetime', (
@@ -55,18 +61,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(eventsFor('PlanixProjectsViewModel'), hasLength(1));
-    expect(eventsFor('PlanixProjectsViewModel').single, startsWith('[di] + '));
+    expect(eventsFor('PlanixProjectsViewModel').single, endsWith(' created'));
 
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    final events = eventsFor('PlanixProjectsViewModel');
-    expect(events, hasLength(2));
-    expect(events.last, startsWith('[di] - '));
     expect(
-      events.first.split('#').last,
-      events.last.split('#').last,
-      reason: 'the same instance was created then disposed',
+      eventsFor('PlanixProjectsViewModel'),
+      ['[di] PlanixProjectsViewModel created', '[di] PlanixProjectsViewModel deleted'],
+      reason: 'created on the way in, deleted on the way out',
     );
   });
 
@@ -82,23 +85,18 @@ void main() {
     await tester.pumpAndSettle();
 
     final disposed = logs
-        .where((l) => l.startsWith('[di] - '))
-        .map((l) => l.split('#').first.replaceFirst('[di] - ', ''))
+        .where((l) => l.endsWith(' deleted'))
+        .map(typeOf)
         .toList();
 
     expect(
       disposed,
-      containsAll([
-        'ChannelApiClient',
-        'ChannelLocalService',
-        'ChannelRepositoryRemote',
-        'HomeViewModel',
-        'ChannelsViewModel',
-      ]),
+      containsAll(['ChannelLocalService', 'HomeViewModel', 'ChannelsViewModel']),
+      reason: 'ViewModels and resource-owning services release with the scope',
     );
     expect(
       disposed,
-      isNot(contains('AuthRepositoryRemote')),
+      isNot(contains('AuthLocalService')),
       reason: 'auth outlives the session scope',
     );
   });

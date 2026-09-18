@@ -18,7 +18,7 @@ class InvalidChannelNameException implements Exception {
   String toString() => 'InvalidChannelNameException($name)';
 }
 
-class ChannelApiClient {
+class ChannelApiClient extends BaseApiClient {
   final _channels = <Map<String, Object>>[
     {
       'id': 'general',

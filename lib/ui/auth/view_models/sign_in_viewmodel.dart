@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:sun_shine/core.dart';
 
 typedef Credentials = ({String email, String password});
 
-class SignInViewModel extends ChangeNotifier {
+class SignInViewModel extends BaseViewModel {
   SignInViewModel({required AuthRepository authRepository})
     : _authRepository = authRepository {
     signIn = Command1(_signIn);

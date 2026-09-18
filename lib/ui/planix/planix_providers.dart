@@ -3,13 +3,13 @@ import 'package:sun_shine/core.dart';
 
 List<SingleChildWidget> get planixModuleProviders {
   return [
-    trackedProvider((context) => ProjectApiClient()),
-    trackedProvider(
-      (context) => ProjectLocalService(),
-      dispose: (service) => service.dispose(),
+    Provider(create: (context) => ProjectApiClient()),
+    Provider(
+      create: (context) => ProjectLocalService(),
+      dispose: (context, service) => service.dispose(),
     ),
-    trackedProvider<ProjectRepository>(
-      (context) => ProjectRepositoryRemote(
+    Provider<ProjectRepository>(
+      create: (context) => ProjectRepositoryRemote(
         apiClient: context.read(),
         localService: context.read(),
       ),
@@ -19,16 +19,17 @@ List<SingleChildWidget> get planixModuleProviders {
 
 List<SingleChildWidget> get planixProjectsProviders {
   return [
-    trackedViewModel(
-      (context) => PlanixProjectsViewModel(projectRepository: context.read()),
+    ChangeNotifierProvider(
+      create: (context) =>
+          PlanixProjectsViewModel(projectRepository: context.read()),
     ),
   ];
 }
 
 List<SingleChildWidget> planixProjectDetailProviders(String projectId) {
   return [
-    trackedViewModel(
-      (context) => PlanixProjectDetailViewModel(
+    ChangeNotifierProvider(
+      create: (context) => PlanixProjectDetailViewModel(
         projectId: projectId,
         projectRepository: context.read(),
       ),

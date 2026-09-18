@@ -1,6 +1,6 @@
 import 'package:sun_shine/core.dart';
 
-class WorkspaceRepositoryRemote implements WorkspaceRepository {
+class WorkspaceRepositoryRemote extends BaseRepo implements WorkspaceRepository {
   WorkspaceRepositoryRemote({required WorkspaceApiClient apiClient})
     : _apiClient = apiClient;
 

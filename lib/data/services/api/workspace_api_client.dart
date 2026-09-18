@@ -1,6 +1,6 @@
 import 'package:sun_shine/core.dart';
 
-class WorkspaceApiClient {
+class WorkspaceApiClient extends BaseApiClient {
   static const _sampleWorkspaces = [
     {'id': 'ws_1', 'name': 'Sun Shine', 'badge_count': 3},
     {'id': 'ws_2', 'name': 'Design Team', 'badge_count': 0},

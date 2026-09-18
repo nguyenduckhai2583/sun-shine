@@ -18,7 +18,7 @@ class InvalidProjectNameException implements Exception {
   String toString() => 'InvalidProjectNameException($name)';
 }
 
-class ProjectApiClient {
+class ProjectApiClient extends BaseApiClient {
   final _projects = <Map<String, Object>>[
     {'id': 'sun', 'name': 'Sun Shine', 'key': 'sun', 'open_tasks': 12},
     {'id': 'hplix', 'name': 'Hplix Platform', 'key': 'hpx', 'open_tasks': 47},

@@ -7,7 +7,7 @@ class InvalidCredentialsException implements Exception {
   String toString() => 'InvalidCredentialsException()';
 }
 
-class AuthApiClient {
+class AuthApiClient extends BaseApiClient {
   Future<Result<SessionApiModel>> signIn(String email, String password) async {
     try {
       if (!email.contains('@') || password.isEmpty) {

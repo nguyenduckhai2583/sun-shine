@@ -1,6 +1,6 @@
 import 'package:sun_shine/core.dart';
 
-class ChannelRepositoryRemote implements ChannelRepository {
+class ChannelRepositoryRemote extends BaseRepo implements ChannelRepository {
   ChannelRepositoryRemote({
     required ChannelApiClient apiClient,
     required ChannelLocalService localService,

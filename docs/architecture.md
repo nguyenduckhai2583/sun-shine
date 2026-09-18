@@ -216,40 +216,59 @@ refresh listener as well would make the same transition fire twice.
 
 ### Instance lifecycle logging
 
-Every ViewModel, repository, local service and API client is registered through
-one of two helpers in `lib/utils/tracked_providers.dart`, so creation and
-disposal are logged from a single place:
+`package:provider` has no observer hook — that is Riverpod's `ProviderObserver`
+— and `ChangeNotifier` has none either: it is a `mixin class` with no
+constructor, so there is nothing to notify from. The seam therefore lives on the
+objects, not on the registration. `lib/utils/di.dart` defines a `DiObserver` and
+one base class per layer that reports through it, exactly the way `BlocBase`
+reports through `Bloc.observer`:
+
+- `BaseViewModel extends ChangeNotifier` — reports creation and disposal.
+- `BaseApiClient` — reports creation only.
+- `BaseRepo` — reports creation only.
+- `BaseLocalService` — reports creation and disposal; it is the only
+  data-layer object that owns a resource.
+
+Registration sites are plain `provider` API, with no wrapper to learn:
 
 ```dart
-trackedProvider((context) => ChannelApiClient()),
-trackedProvider(
-  (context) => ChannelLocalService(),
-  dispose: (service) => service.dispose(),
+Provider(create: (context) => ChannelApiClient()),
+Provider(
+  create: (context) => ChannelLocalService(),
+  dispose: (context, service) => service.dispose(),
 ),
-trackedViewModel((context) => ChannelsViewModel(channelRepository: context.read())),
+ChangeNotifierProvider(
+  create: (context) => ChannelsViewModel(channelRepository: context.read()),
+),
 ```
 
 Output is one line per event, with the identity hash so the same instance can be
 matched across create and dispose:
 
 ```
-[di] + ChannelLocalService#1f3a2b
-[di] - ChannelLocalService#1f3a2b
+[di] ChannelLocalService created
+[di] ChannelLocalService deleted
 ```
 
-`DiLog.enabled` defaults to `kDebugMode` and `main.dart` sets it from
-`BuildConfig().isDebug`. `DiLog.output` swaps the sink — leave it null for
-`debugPrint`, or point it at a real logger.
+`main.dart` installs the observer with `Di.observer = const DiLog()`; until then
+it is silent. `DiLog.enabled` defaults to `kDebugMode` and `main.dart` sets it
+from `BuildConfig().isDebug`. `DiLog.output` swaps the sink — leave it null for
+`debugPrint`, or point it at a real logger. Because `DiLog` is just one
+`DiObserver`, a test spy or leak detector can replace it without touching a
+single registration.
 
-`trackedViewModel` returns a `ListenableProvider` rather than a
-`ChangeNotifierProvider`: the latter disposes internally with no hook, so there
-is no way to log it. `ListenableProvider` takes a `dispose` callback, and
-listening behaviour is identical — `ChangeNotifierProvider` only adds the
-automatic dispose that the helper now performs itself.
+`BaseApiClient` and `BaseRepo` deliberately declare nothing but a constructor. A
+constructor is not part of a class's implicit interface, so the fakes in
+`test/testing/fakes/` keep saying `implements ChannelApiClient` with nothing
+extra to stub out. `BaseLocalService` can afford a `dispose()` because nothing
+fakes a local service by interface; its subclasses override it, close their
+stream, and call `super`.
 
-Nothing else needs a per-class change. Framework objects such as
-`ScrollController` are deliberately not covered; `FlutterMemoryAllocations`
-would catch those too, but the noise swamps the four layers worth watching.
+Framework objects such as `ScrollController` are deliberately not covered.
+`FlutterMemoryAllocations` would catch those, but it only sees `ChangeNotifier`
+subclasses, dispatches creation lazily on the first `addListener` rather than at
+construction, and is assert-gated — a ViewModel created but never watched would
+emit no events at all, which is exactly the instance worth catching.
 
 ### Dependency scopes
 

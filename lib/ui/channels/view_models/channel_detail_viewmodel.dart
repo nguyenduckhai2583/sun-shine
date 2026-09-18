@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:sun_shine/core.dart';
 
-class ChannelDetailViewModel extends ChangeNotifier {
+class ChannelDetailViewModel extends BaseViewModel {
   ChannelDetailViewModel({
     required String channelId,
     required ChannelRepository channelRepository,

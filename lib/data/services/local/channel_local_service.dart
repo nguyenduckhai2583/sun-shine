@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sun_shine/core.dart';
 
-class ChannelLocalService {
+class ChannelLocalService extends BaseLocalService {
   final _channels = BehaviorSubject<List<Channel>>.seeded(const []);
 
   Stream<List<Channel>> get channels => _channels.stream;
@@ -38,7 +38,9 @@ class ChannelLocalService {
 
   bool get isDisposed => _channels.isClosed;
 
+  @override
   void dispose() {
     _channels.close();
+    super.dispose();
   }
 }

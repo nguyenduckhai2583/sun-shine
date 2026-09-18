@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:sun_shine/core.dart';
 
-class PlanixProjectsViewModel extends ChangeNotifier {
+class PlanixProjectsViewModel extends BaseViewModel {
   PlanixProjectsViewModel({required ProjectRepository projectRepository})
     : _projectRepository = projectRepository {
     _subscription = _projectRepository.projects.listen(_onProjects);

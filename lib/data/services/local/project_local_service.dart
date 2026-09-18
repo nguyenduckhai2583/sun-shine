@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sun_shine/core.dart';
 
-class ProjectLocalService {
+class ProjectLocalService extends BaseLocalService {
   final _projects = BehaviorSubject<List<Project>>.seeded(const []);
 
   Stream<List<Project>> get projects => _projects.stream;
@@ -38,7 +38,9 @@ class ProjectLocalService {
 
   bool get isDisposed => _projects.isClosed;
 
+  @override
   void dispose() {
     _projects.close();
+    super.dispose();
   }
 }

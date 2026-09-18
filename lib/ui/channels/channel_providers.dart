@@ -3,13 +3,13 @@ import 'package:sun_shine/core.dart';
 
 List<SingleChildWidget> get channelDataProviders {
   return [
-    trackedProvider((context) => ChannelApiClient()),
-    trackedProvider(
-      (context) => ChannelLocalService(),
-      dispose: (service) => service.dispose(),
+    Provider(create: (context) => ChannelApiClient()),
+    Provider(
+      create: (context) => ChannelLocalService(),
+      dispose: (context, service) => service.dispose(),
     ),
-    trackedProvider<ChannelRepository>(
-      (context) => ChannelRepositoryRemote(
+    Provider<ChannelRepository>(
+      create: (context) => ChannelRepositoryRemote(
         apiClient: context.read(),
         localService: context.read(),
       ),
@@ -19,16 +19,16 @@ List<SingleChildWidget> get channelDataProviders {
 
 List<SingleChildWidget> get channelsProviders {
   return [
-    trackedViewModel(
-      (context) => ChannelsViewModel(channelRepository: context.read()),
+    ChangeNotifierProvider(
+      create: (context) => ChannelsViewModel(channelRepository: context.read()),
     ),
   ];
 }
 
 List<SingleChildWidget> channelDetailProviders(String channelId) {
   return [
-    trackedViewModel(
-      (context) => ChannelDetailViewModel(
+    ChangeNotifierProvider(
+      create: (context) => ChannelDetailViewModel(
         channelId: channelId,
         channelRepository: context.read(),
       ),
