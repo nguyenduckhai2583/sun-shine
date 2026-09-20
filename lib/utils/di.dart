@@ -33,6 +33,17 @@ class _SilentDiObserver extends DiObserver {
 abstract final class Di {
   /// Set once, in `main()` or in a test's `setUp`. Silent until then.
   static DiObserver observer = const DiObserver.silent();
+
+  /// Reports creation for an object that cannot extend a base class.
+  ///
+  /// Retrofit generates `class _FooApiClient implements FooApiClient`, and an
+  /// `implements` never inherits a constructor — so a generated client can
+  /// never report through [BaseApiClient]. Registration sites wrap it instead:
+  /// `Provider(create: (c) => Di.observed(FooApiClient(c.read())))`.
+  static T observed<T extends Object>(T instance) {
+    observer.onCreate(instance);
+    return instance;
+  }
 }
 
 /// Base class for ViewModels, so they are observed without wrapping the

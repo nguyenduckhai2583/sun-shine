@@ -107,4 +107,17 @@ void main() {
 
     expect(logs, isEmpty);
   });
+
+  test('Di.observed reports creation and hands the instance back', () {
+    final instance = StringBuffer('x');
+
+    final returned = Di.observed(instance);
+
+    expect(
+      identical(returned, instance),
+      isTrue,
+      reason: 'it wraps a registration, so it must be transparent',
+    );
+    expect(logs, ['[di] StringBuffer created']);
+  });
 }

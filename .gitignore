@@ -52,6 +52,9 @@ app.*.map.json
 # Claude Code
 .claude/
 
+# Docs
+/docs/
+
 # Multi-environment: generated / secret build inputs
 ios/Flutter/Define.xcconfig
 android/signin.properties
