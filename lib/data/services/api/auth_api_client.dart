@@ -15,9 +15,11 @@ class AuthApiClient extends BaseApiClient {
       }
       return Result.ok(
         SessionApiModel(
-          userId: 'user_${email.split('@').first}',
-          email: email,
-          accessToken: 'token_${email.hashCode}',
+          token: 'token_${email.hashCode}',
+          user: UserApiModel(
+            id: 'user_${email.split('@').first}',
+            email: email,
+          ),
         ),
       );
     } on Exception catch (e) {

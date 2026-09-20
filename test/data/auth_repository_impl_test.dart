@@ -25,7 +25,7 @@ void main() {
 
       expect(result, isA<Ok<Session>>());
       expect(repository.isSignedIn, isTrue);
-      expect(repository.currentSession?.email, 'khai@sunshine.com');
+      expect(repository.currentSession?.user?.email, 'khai@sunshine.com');
     });
 
     test('rejects invalid credentials', () async {
@@ -59,7 +59,11 @@ void main() {
         repository.session,
         emitsInOrder([
           null,
-          isA<Session>().having((s) => s.email, 'email', 'khai@sunshine.com'),
+          isA<Session>().having(
+            (s) => s.user?.email,
+            'email',
+            'khai@sunshine.com',
+          ),
           null,
         ]),
       );

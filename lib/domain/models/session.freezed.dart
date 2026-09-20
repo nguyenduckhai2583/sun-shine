@@ -15,7 +15,15 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Session {
 
- String get userId; String get email; String get accessToken;
+ String get userId; String get token; String? get refreshToken; int? get expireAt; bool get isTmpToken; String? get workspaceId; User? get user;/// The MD5 of the salted password, derived at sign-in.
+///
+/// Combined with the user's passcode it produces the key that unlocks
+/// [encryptedPrivateKey]; the plaintext password is never kept.
+ String? get md5Password;/// The user's E2E private key as the server holds it — wrapped with a key
+/// derived from their credentials, so the server cannot read it.
+ String? get encryptedPrivateKey;/// The same private key re-wrapped with this device's key, so unlocking it
+/// again does not require the password.
+ String? get localEncryptedPrivateKey;
 /// Create a copy of Session
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +35,20 @@ $SessionCopyWith<Session> get copyWith => _$SessionCopyWithImpl<Session>(this as
 @override
 bool operator ==(Object other) {
   final _this = this as Session;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Session&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.accessToken, _this.accessToken) || other.accessToken == _this.accessToken));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Session&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.token, _this.token) || other.token == _this.token)&&(identical(other.refreshToken, _this.refreshToken) || other.refreshToken == _this.refreshToken)&&(identical(other.expireAt, _this.expireAt) || other.expireAt == _this.expireAt)&&(identical(other.isTmpToken, _this.isTmpToken) || other.isTmpToken == _this.isTmpToken)&&(identical(other.workspaceId, _this.workspaceId) || other.workspaceId == _this.workspaceId)&&(identical(other.user, _this.user) || other.user == _this.user)&&(identical(other.md5Password, _this.md5Password) || other.md5Password == _this.md5Password)&&(identical(other.encryptedPrivateKey, _this.encryptedPrivateKey) || other.encryptedPrivateKey == _this.encryptedPrivateKey)&&(identical(other.localEncryptedPrivateKey, _this.localEncryptedPrivateKey) || other.localEncryptedPrivateKey == _this.localEncryptedPrivateKey));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Session;
-  return Object.hash(runtimeType,_this.userId,_this.email,_this.accessToken);
+  return Object.hash(runtimeType,_this.userId,_this.token,_this.refreshToken,_this.expireAt,_this.isTmpToken,_this.workspaceId,_this.user,_this.md5Password,_this.encryptedPrivateKey,_this.localEncryptedPrivateKey);
 }
 
 @override
 String toString() {
   final _this = this as Session;
-  return 'Session(userId: ${_this.userId}, email: ${_this.email}, accessToken: ${_this.accessToken})';
+  return 'Session(userId: ${_this.userId}, token: ${_this.token}, refreshToken: ${_this.refreshToken}, expireAt: ${_this.expireAt}, isTmpToken: ${_this.isTmpToken}, workspaceId: ${_this.workspaceId}, user: ${_this.user}, md5Password: ${_this.md5Password}, encryptedPrivateKey: ${_this.encryptedPrivateKey}, localEncryptedPrivateKey: ${_this.localEncryptedPrivateKey})';
 }
 
 
@@ -51,11 +59,11 @@ abstract mixin class $SessionCopyWith<$Res>  {
   factory $SessionCopyWith(Session value, $Res Function(Session) _then) = _$SessionCopyWithImpl;
 @useResult
 $Res call({
- String userId, String email, String accessToken
+ String userId, String token, String? refreshToken, int? expireAt, bool isTmpToken, String? workspaceId, User? user, String? md5Password, String? encryptedPrivateKey, String? localEncryptedPrivateKey
 });
 
 
-
+$UserCopyWith<$Res>? get user;
 
 }
 /// @nodoc
@@ -68,15 +76,34 @@ class _$SessionCopyWithImpl<$Res>
 
 /// Create a copy of Session
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? accessToken = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? token = null,Object? refreshToken = freezed,Object? expireAt = freezed,Object? isTmpToken = null,Object? workspaceId = freezed,Object? user = freezed,Object? md5Password = freezed,Object? encryptedPrivateKey = freezed,Object? localEncryptedPrivateKey = freezed,}) {
   return _then(Session(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
-as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
-as String,
+as String,token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
+as String?,expireAt: freezed == expireAt ? _self.expireAt : expireAt // ignore: cast_nullable_to_non_nullable
+as int?,isTmpToken: null == isTmpToken ? _self.isTmpToken : isTmpToken // ignore: cast_nullable_to_non_nullable
+as bool,workspaceId: freezed == workspaceId ? _self.workspaceId : workspaceId // ignore: cast_nullable_to_non_nullable
+as String?,user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
+as User?,md5Password: freezed == md5Password ? _self.md5Password : md5Password // ignore: cast_nullable_to_non_nullable
+as String?,encryptedPrivateKey: freezed == encryptedPrivateKey ? _self.encryptedPrivateKey : encryptedPrivateKey // ignore: cast_nullable_to_non_nullable
+as String?,localEncryptedPrivateKey: freezed == localEncryptedPrivateKey ? _self.localEncryptedPrivateKey : localEncryptedPrivateKey // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
+/// Create a copy of Session
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserCopyWith<$Res>? get user {
+    if (_self.user == null) {
+    return null;
+  }
 
+  return $UserCopyWith<$Res>(_self.user!, (value) {
+    return _then(_self.copyWith(user: value));
+  });
+}
 }
 
 
@@ -158,10 +185,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String email,  String accessToken)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String token,  String? refreshToken,  int? expireAt,  bool isTmpToken,  String? workspaceId,  User? user,  String? md5Password,  String? encryptedPrivateKey,  String? localEncryptedPrivateKey)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Session() when $default != null:
-return $default(_that.userId,_that.email,_that.accessToken);case _:
+return $default(_that.userId,_that.token,_that.refreshToken,_that.expireAt,_that.isTmpToken,_that.workspaceId,_that.user,_that.md5Password,_that.encryptedPrivateKey,_that.localEncryptedPrivateKey);case _:
   return orElse();
 
 }
@@ -179,10 +206,10 @@ return $default(_that.userId,_that.email,_that.accessToken);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String email,  String accessToken)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String token,  String? refreshToken,  int? expireAt,  bool isTmpToken,  String? workspaceId,  User? user,  String? md5Password,  String? encryptedPrivateKey,  String? localEncryptedPrivateKey)  $default,) {final _that = this;
 switch (_that) {
 case _Session():
-return $default(_that.userId,_that.email,_that.accessToken);case _:
+return $default(_that.userId,_that.token,_that.refreshToken,_that.expireAt,_that.isTmpToken,_that.workspaceId,_that.user,_that.md5Password,_that.encryptedPrivateKey,_that.localEncryptedPrivateKey);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +226,10 @@ return $default(_that.userId,_that.email,_that.accessToken);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String email,  String accessToken)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String token,  String? refreshToken,  int? expireAt,  bool isTmpToken,  String? workspaceId,  User? user,  String? md5Password,  String? encryptedPrivateKey,  String? localEncryptedPrivateKey)?  $default,) {final _that = this;
 switch (_that) {
 case _Session() when $default != null:
-return $default(_that.userId,_that.email,_that.accessToken);case _:
+return $default(_that.userId,_that.token,_that.refreshToken,_that.expireAt,_that.isTmpToken,_that.workspaceId,_that.user,_that.md5Password,_that.encryptedPrivateKey,_that.localEncryptedPrivateKey);case _:
   return null;
 
 }
@@ -213,13 +240,28 @@ return $default(_that.userId,_that.email,_that.accessToken);case _:
 /// @nodoc
 
 
-class _Session implements Session {
-  const _Session({required this.userId, required this.email, required this.accessToken});
+class _Session extends Session {
+  const _Session({required this.userId, required this.token, this.refreshToken, this.expireAt, this.isTmpToken = false, this.workspaceId, this.user, this.md5Password, this.encryptedPrivateKey, this.localEncryptedPrivateKey}): super._();
   
 
 @override final  String userId;
-@override final  String email;
-@override final  String accessToken;
+@override final  String token;
+@override final  String? refreshToken;
+@override final  int? expireAt;
+@override@JsonKey() final  bool isTmpToken;
+@override final  String? workspaceId;
+@override final  User? user;
+/// The MD5 of the salted password, derived at sign-in.
+///
+/// Combined with the user's passcode it produces the key that unlocks
+/// [encryptedPrivateKey]; the plaintext password is never kept.
+@override final  String? md5Password;
+/// The user's E2E private key as the server holds it — wrapped with a key
+/// derived from their credentials, so the server cannot read it.
+@override final  String? encryptedPrivateKey;
+/// The same private key re-wrapped with this device's key, so unlocking it
+/// again does not require the password.
+@override final  String? localEncryptedPrivateKey;
 
 /// Create a copy of Session
 /// with the given fields replaced by the non-null parameter values.
@@ -231,18 +273,18 @@ _$SessionCopyWith<_Session> get copyWith => __$SessionCopyWithImpl<_Session>(thi
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Session&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Session&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.token, token) || other.token == token)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.expireAt, expireAt) || other.expireAt == expireAt)&&(identical(other.isTmpToken, isTmpToken) || other.isTmpToken == isTmpToken)&&(identical(other.workspaceId, workspaceId) || other.workspaceId == workspaceId)&&(identical(other.user, user) || other.user == user)&&(identical(other.md5Password, md5Password) || other.md5Password == md5Password)&&(identical(other.encryptedPrivateKey, encryptedPrivateKey) || other.encryptedPrivateKey == encryptedPrivateKey)&&(identical(other.localEncryptedPrivateKey, localEncryptedPrivateKey) || other.localEncryptedPrivateKey == localEncryptedPrivateKey));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,userId,email,accessToken);
+    return Object.hash(runtimeType,userId,token,refreshToken,expireAt,isTmpToken,workspaceId,user,md5Password,encryptedPrivateKey,localEncryptedPrivateKey);
 }
 
 @override
 String toString() {
-    return 'Session(userId: $userId, email: $email, accessToken: $accessToken)';
+    return 'Session(userId: $userId, token: $token, refreshToken: $refreshToken, expireAt: $expireAt, isTmpToken: $isTmpToken, workspaceId: $workspaceId, user: $user, md5Password: $md5Password, encryptedPrivateKey: $encryptedPrivateKey, localEncryptedPrivateKey: $localEncryptedPrivateKey)';
 }
 
 
@@ -253,11 +295,11 @@ abstract mixin class _$SessionCopyWith<$Res> implements $SessionCopyWith<$Res> {
   factory _$SessionCopyWith(_Session value, $Res Function(_Session) _then) = __$SessionCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String email, String accessToken
+ String userId, String token, String? refreshToken, int? expireAt, bool isTmpToken, String? workspaceId, User? user, String? md5Password, String? encryptedPrivateKey, String? localEncryptedPrivateKey
 });
 
 
-
+@override $UserCopyWith<$Res>? get user;
 
 }
 /// @nodoc
@@ -270,16 +312,35 @@ class __$SessionCopyWithImpl<$Res>
 
 /// Create a copy of Session
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? accessToken = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? token = null,Object? refreshToken = freezed,Object? expireAt = freezed,Object? isTmpToken = null,Object? workspaceId = freezed,Object? user = freezed,Object? md5Password = freezed,Object? encryptedPrivateKey = freezed,Object? localEncryptedPrivateKey = freezed,}) {
   return _then(_Session(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
-as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
-as String,
+as String,token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
+as String?,expireAt: freezed == expireAt ? _self.expireAt : expireAt // ignore: cast_nullable_to_non_nullable
+as int?,isTmpToken: null == isTmpToken ? _self.isTmpToken : isTmpToken // ignore: cast_nullable_to_non_nullable
+as bool,workspaceId: freezed == workspaceId ? _self.workspaceId : workspaceId // ignore: cast_nullable_to_non_nullable
+as String?,user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
+as User?,md5Password: freezed == md5Password ? _self.md5Password : md5Password // ignore: cast_nullable_to_non_nullable
+as String?,encryptedPrivateKey: freezed == encryptedPrivateKey ? _self.encryptedPrivateKey : encryptedPrivateKey // ignore: cast_nullable_to_non_nullable
+as String?,localEncryptedPrivateKey: freezed == localEncryptedPrivateKey ? _self.localEncryptedPrivateKey : localEncryptedPrivateKey // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
+/// Create a copy of Session
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserCopyWith<$Res>? get user {
+    if (_self.user == null) {
+    return null;
+  }
 
+  return $UserCopyWith<$Res>(_self.user!, (value) {
+    return _then(_self.copyWith(user: value));
+  });
+}
 }
 
 // dart format on

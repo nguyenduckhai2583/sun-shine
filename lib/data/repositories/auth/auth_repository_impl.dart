@@ -40,10 +40,21 @@ class AuthRepositoryImpl extends BaseRepo implements AuthRepository {
   }
 
   Session _toDomain(SessionApiModel model) {
+    final user = model.user;
     return Session(
-      userId: model.userId,
-      email: model.email,
-      accessToken: model.accessToken,
+      userId: user?.id ?? '',
+      token: model.token,
+      refreshToken: model.refreshToken,
+      expireAt: model.expireAt,
+      isTmpToken: model.isTmpToken ?? false,
+      user: user == null
+          ? null
+          : User(
+              id: user.id,
+              email: user.email,
+              fullName: user.fullName,
+              avatar: user.avatar,
+            ),
     );
   }
 }
