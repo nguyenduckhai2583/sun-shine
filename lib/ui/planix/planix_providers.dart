@@ -9,7 +9,7 @@ List<SingleChildWidget> get planixModuleProviders {
       dispose: (context, service) => service.dispose(),
     ),
     Provider<ProjectRepository>(
-      create: (context) => ProjectRepositoryRemote(
+      create: (context) => ProjectRepositoryImpl(
         apiClient: context.read(),
         localService: context.read(),
       ),

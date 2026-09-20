@@ -9,7 +9,7 @@ List<SingleChildWidget> get authProviders {
       dispose: (context, service) => service.dispose(),
     ),
     Provider<AuthRepository>(
-      create: (context) => AuthRepositoryRemote(
+      create: (context) => AuthRepositoryImpl(
         apiClient: context.read(),
         localService: context.read(),
       ),

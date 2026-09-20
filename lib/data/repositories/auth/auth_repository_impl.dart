@@ -1,7 +1,7 @@
 import 'package:sun_shine/core.dart';
 
-class AuthRepositoryRemote extends BaseRepo implements AuthRepository {
-  AuthRepositoryRemote({
+class AuthRepositoryImpl extends BaseRepo implements AuthRepository {
+  AuthRepositoryImpl({
     required AuthApiClient apiClient,
     required AuthLocalService localService,
   }) : _apiClient = apiClient,

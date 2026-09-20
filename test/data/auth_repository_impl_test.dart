@@ -2,13 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sun_shine/core.dart';
 
 void main() {
-  group('AuthRepositoryRemote', () {
+  group('AuthRepositoryImpl', () {
     late AuthLocalService localService;
-    late AuthRepositoryRemote repository;
+    late AuthRepositoryImpl repository;
 
     setUp(() {
       localService = AuthLocalService();
-      repository = AuthRepositoryRemote(
+      repository = AuthRepositoryImpl(
         apiClient: AuthApiClient(),
         localService: localService,
       );

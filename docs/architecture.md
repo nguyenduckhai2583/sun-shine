@@ -45,7 +45,7 @@ back the other way only as method calls on the ViewModel.
 | 12 | Dependency injection | Strongly | `provider`; `lib/config/dependencies.dart` |
 | 13 | `go_router` for navigation | Recommend | `lib/routing/`; see [routing.md](routing.md) |
 | 14 | Standard naming for classes/files/dirs | Recommend | `HomeViewModel`, `HomeScreen`, `WorkspaceRepository`; shared widgets in `ui/core/`, not `/widgets` |
-| 15 | Abstract repository classes | Strongly | `WorkspaceRepository` is abstract; `WorkspaceRepositoryRemote` implements it |
+| 15 | Abstract repository classes | Strongly | `WorkspaceRepository` is abstract; `WorkspaceRepositoryImpl` implements it |
 | 16 | Test components separately and together | Strongly | unit tests per service/repository/ViewModel + widget tests covering routing and DI |
 | 17 | Make fakes for testing | Strongly | `test/testing/fakes/` |
 
@@ -389,7 +389,7 @@ fvm flutter test
 
 - **Services** — `test/data/workspace_api_client_test.dart`
 - **Models** — `test/data/workspace_api_model_test.dart` (JSON round-trip)
-- **Repositories** — `test/data/workspace_repository_remote_test.dart`, driven
+- **Repositories** — `test/data/workspace_repository_impl_test.dart`, driven
   by `FakeWorkspaceApiClient`, covering mapping, failure and caching
 - **ViewModels** — `test/ui/home/view_models/home_viewmodel_test.dart`
 - **Commands** — `test/utils/command_test.dart`

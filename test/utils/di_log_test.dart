@@ -34,12 +34,12 @@ void main() {
     for (final type in [
       'AuthApiClient',
       'AuthLocalService',
-      'AuthRepositoryRemote',
+      'AuthRepositoryImpl',
       'ChannelApiClient',
       'ChannelLocalService',
-      'ChannelRepositoryRemote',
+      'ChannelRepositoryImpl',
       'WorkspaceApiClient',
-      'WorkspaceRepositoryRemote',
+      'WorkspaceRepositoryImpl',
       'HomeViewModel',
       'ChannelsViewModel',
     ]) {

@@ -6,7 +6,7 @@ List<SingleChildWidget> get homeProviders {
     Provider(create: (context) => WorkspaceApiClient()),
     Provider<WorkspaceRepository>(
       create: (context) =>
-          WorkspaceRepositoryRemote(apiClient: context.read()),
+          WorkspaceRepositoryImpl(apiClient: context.read()),
     ),
     ChangeNotifierProvider(
       create: (context) => HomeViewModel(workspaceRepository: context.read()),

@@ -2,13 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sun_shine/core.dart';
 
 void main() {
-  group('ProjectRepositoryRemote', () {
+  group('ProjectRepositoryImpl', () {
     late ProjectLocalService localService;
-    late ProjectRepositoryRemote repository;
+    late ProjectRepositoryImpl repository;
 
     setUp(() {
       localService = ProjectLocalService();
-      repository = ProjectRepositoryRemote(
+      repository = ProjectRepositoryImpl(
         apiClient: ProjectApiClient(),
         localService: localService,
       );

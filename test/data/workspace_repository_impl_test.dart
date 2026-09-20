@@ -4,12 +4,12 @@ import 'package:sun_shine/core.dart';
 import '../testing/fakes/fake_workspace_api_client.dart';
 
 void main() {
-  group('WorkspaceRepositoryRemote', () {
+  group('WorkspaceRepositoryImpl', () {
     late FakeWorkspaceApiClient apiClient;
-    late WorkspaceRepositoryRemote repository;
+    late WorkspaceRepositoryImpl repository;
     setUp(() {
       apiClient = FakeWorkspaceApiClient();
-      repository = WorkspaceRepositoryRemote(apiClient: apiClient);
+      repository = WorkspaceRepositoryImpl(apiClient: apiClient);
     });
     test('maps api models onto domain models', () async {
       final result = await repository.getWorkspaces();

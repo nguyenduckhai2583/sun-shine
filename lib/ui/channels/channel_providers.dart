@@ -9,7 +9,7 @@ List<SingleChildWidget> get channelDataProviders {
       dispose: (context, service) => service.dispose(),
     ),
     Provider<ChannelRepository>(
-      create: (context) => ChannelRepositoryRemote(
+      create: (context) => ChannelRepositoryImpl(
         apiClient: context.read(),
         localService: context.read(),
       ),

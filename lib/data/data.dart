@@ -1,11 +1,11 @@
 export 'repositories/auth/auth_repository.dart';
-export 'repositories/auth/auth_repository_remote.dart';
+export 'repositories/auth/auth_repository_impl.dart';
 export 'repositories/channel/channel_repository.dart';
-export 'repositories/channel/channel_repository_remote.dart';
+export 'repositories/channel/channel_repository_impl.dart';
 export 'repositories/project/project_repository.dart';
-export 'repositories/project/project_repository_remote.dart';
+export 'repositories/project/project_repository_impl.dart';
 export 'repositories/workspace/workspace_repository.dart';
-export 'repositories/workspace/workspace_repository_remote.dart';
+export 'repositories/workspace/workspace_repository_impl.dart';
 export 'services/api/auth_api_client.dart';
 export 'services/api/channel_api_client.dart';
 export 'services/api/model/channel_api_model.dart';

@@ -4,15 +4,15 @@ import 'package:sun_shine/core.dart';
 import '../testing/fakes/fake_channel_api_client.dart';
 
 void main() {
-  group('ChannelRepositoryRemote', () {
+  group('ChannelRepositoryImpl', () {
     late FakeChannelApiClient apiClient;
     late ChannelLocalService localService;
-    late ChannelRepositoryRemote repository;
+    late ChannelRepositoryImpl repository;
 
     setUp(() {
       apiClient = FakeChannelApiClient();
       localService = ChannelLocalService();
-      repository = ChannelRepositoryRemote(
+      repository = ChannelRepositoryImpl(
         apiClient: apiClient,
         localService: localService,
       );

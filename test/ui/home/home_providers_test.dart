@@ -23,7 +23,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(resolved, isA<WorkspaceRepositoryRemote>());
+    expect(resolved, isA<WorkspaceRepositoryImpl>());
   });
 
   testWidgets('each home scope builds its own workspace repository', (
