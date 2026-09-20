@@ -21,38 +21,54 @@ GoRouter createRouter({
     initialLocation: initialLocation,
     debugLogDiagnostics: debugLogDiagnostics,
     errorBuilder: (context, state) => ErrorScreen(error: state.error),
-    redirect: (context, state) {
-      final signedIn = sessionRepository.isSignedIn;
-      final goingToSignIn = state.matchedLocation == Routes.signIn;
-      if (!signedIn) return goingToSignIn ? null : Routes.signIn;
-      return goingToSignIn ? Routes.home : null;
-    },
+    // Without this the redirect only re-runs on navigation. Signing in happens
+    // to work anyway, because AuthScope's ValueKey rebuilds the whole app — but
+    // picking a workspace does not change the user id, so nothing would move.
+    refreshListenable: GoRouterRefreshStream(sessionRepository.activeSession),
+    redirect: (context, state) => sessionRedirect(
+      session: sessionRepository.currentSession,
+      location: state.matchedLocation,
+    ),
     routes: [
       GoRoute(
         path: Routes.signIn,
         pageBuilder: (context, state) => _page(state, const SignInScreen()),
       ),
+      // A placeholder until the workspace-picker screen is ported; the redirect
+      // above already routes here when an account has no workspace.
+      GoRoute(
+        path: Routes.workspace,
+        pageBuilder: (context, state) => _page(
+          state,
+          const Scaffold(
+            body: PlaceholderTab(
+              icon: Icons.workspaces_outline,
+              title: 'Workspace',
+              message: 'Choosing a workspace lands here.',
+            ),
+          ),
+        ),
+      ),
       // Nested GoRoutes are sibling pages on one navigator, not parent/child
       // widgets, so a provider inside /planix is invisible to /planix/:id. The
       // shell is the only ancestor both reach; popping it disposes the scope.
       ShellRoute(
-        builder: (context, state, child) =>
-            MultiProvider(
-              providers: [
-                Provider(create: (context) => ProjectApiClient()),
-                Provider(
-                  create: (context) => ProjectLocalService(),
-                  dispose: (context, service) => service.dispose(),
-                ),
-                Provider<ProjectRepository>(
-                  create: (context) => ProjectRepositoryImpl(
-                    apiClient: context.read(),
-                    localService: context.read(),
-                  ),
-                ),
-              ],
-              child: child,
+        builder: (context, state, child) => MultiProvider(
+          providers: [
+            Provider(create: (context) => ProjectApiClient()),
+            Provider(
+              create: (context) => ProjectLocalService(),
+              dispose: (context, service) => service.dispose(),
             ),
+            Provider<ProjectRepository>(
+              create: (context) => ProjectRepositoryImpl(
+                apiClient: context.read(),
+                localService: context.read(),
+              ),
+            ),
+          ],
+          child: child,
+        ),
         routes: [
           GoRoute(
             path: Routes.planix,

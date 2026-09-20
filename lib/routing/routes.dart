@@ -1,6 +1,8 @@
 abstract final class Routes {
   static const signIn = '/sign-in';
 
+  static const workspace = '/workspace';
+
   static const home = channels;
 
   static const channels = '/channels';

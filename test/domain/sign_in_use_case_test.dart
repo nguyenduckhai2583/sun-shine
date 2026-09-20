@@ -16,7 +16,7 @@ void main() {
       authManager = AuthManager(baseUrl: 'https://test.invalid/');
       useCase = SignInUseCase(
         authManager: authManager,
-        authRepository: AuthRepositoryImpl(apiClient: apiClient),
+        authRepository: AuthRepositoryImpl(signInClient: apiClient),
       );
     });
 

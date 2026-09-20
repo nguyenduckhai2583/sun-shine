@@ -13,6 +13,7 @@ Future<SessionRepository> pumpApp(
   WidgetTester tester, {
   String? initialLocation,
   bool signedIn = true,
+  FakeAuthApiClient? authApi,
 }) async {
   // Sign-in hashes the password, which reads the salts off BuildConfig.
   BuildConfig().setupEnvironment();
@@ -28,8 +29,9 @@ Future<SessionRepository> pumpApp(
           create: (context) => AuthManager(baseUrl: 'https://test.invalid/'),
         ),
         Provider<AuthRepository>(
-          create: (context) =>
-              AuthRepositoryImpl(apiClient: FakeAuthApiClient()),
+          create: (context) => AuthRepositoryImpl(
+            signInClient: authApi ?? FakeAuthApiClient(),
+          ),
         ),
         Provider(
           create: (context) => AuthLocalService(),
@@ -67,10 +69,14 @@ Future<SessionRepository> pumpApp(
 Session fakeSession({
   String userId = 'u1',
   String email = 'khai@sunshine.com',
+  String? workspaceId = 'w1',
 }) {
   return Session(
     userId: userId,
     token: 'tok_$userId',
+    // A session without one redirects to the workspace picker, which is not
+    // what most tests are about.
+    workspaceId: workspaceId,
     user: User(id: userId, email: email),
   );
 }
@@ -101,6 +107,9 @@ class _TestAppState extends State<_TestApp> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      MaterialApp.router(routerConfig: _router);
+  Widget build(BuildContext context) => MaterialApp.router(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    routerConfig: _router,
+  );
 }

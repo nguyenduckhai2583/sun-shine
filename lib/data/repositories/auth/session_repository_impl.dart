@@ -37,6 +37,23 @@ class SessionRepositoryImpl extends BaseRepo implements SessionRepository {
   }
 
   @override
+  Future<void> renewToken({
+    required String token,
+    String? refreshToken,
+    int? expireAt,
+  }) async {
+    final session = currentSession;
+    if (session == null) return;
+    _localService.save(
+      session.copyWith(
+        token: token,
+        refreshToken: refreshToken ?? session.refreshToken,
+        expireAt: expireAt ?? session.expireAt,
+      ),
+    );
+  }
+
+  @override
   Future<void> signOut() async {
     _localService.clear();
   }

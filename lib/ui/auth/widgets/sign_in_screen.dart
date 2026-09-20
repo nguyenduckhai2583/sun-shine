@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
 
@@ -44,96 +46,248 @@ class _SignInView extends StatefulWidget {
 }
 
 class _SignInViewState extends State<_SignInView> {
-  final _formKey = GlobalKey<FormState>();
-  final _email = TextEditingController(text: 'khai@sunshine.com');
-  final _password = TextEditingController(text: 'password');
+  // These belong to the view, not the view model: they are how this screen
+  // holds text, and they die with it.
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _passwordFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _email.addListener(_onFormChanged);
+    _password.addListener(_onFormChanged);
+  }
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
+  void _onFormChanged() => setState(() {});
+
+  bool get _isFormValid =>
+      _email.text.trim().isNotEmpty && _password.text.isNotEmpty;
+
   Future<void> _submit() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!_isFormValid) return;
     await context.read<SignInViewModel>().signIn.execute((
-      email: _email.text.trim(),
+      email: _email.text,
       password: _password.text,
     ));
+    // A `true` result means the server wants a second factor. Routing there
+    // waits on the auth-code screen; until then the redirect handles the rest.
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<SignInViewModel>();
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final viewModel = context.read<SignInViewModel>();
+    final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
-    return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.wb_sunny_outlined,
-                  size: 56,
-                  color: Theme.of(context).colorScheme.primary,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) viewModel.cancel();
+      },
+      child: ColoredBox(
+        color: theme.colorScheme.surfaceContainerLowest,
+        child: GridTileBackground(
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 24,
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  'Sun Shine',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _email,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  validator: (v) =>
-                      (v ?? '').contains('@') ? null : 'Enter a valid email',
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _password,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  validator: (v) =>
-                      (v ?? '').isEmpty ? 'Password is required' : null,
-                  onFieldSubmitted: (_) => _submit(),
-                ),
-                const SizedBox(height: 24),
-                ListenableBuilder(
-                  listenable: viewModel.signIn,
-                  builder: (context, _) {
-                    if (viewModel.signIn.running) {
-                      return const CircularProgressIndicator();
-                    }
-                    return Column(
-                      children: [
-                        if (viewModel.signIn.error)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Text(
-                              'Sign in failed',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            if (!viewModel.isAddingAccount) ...[
+                              SvgPicture.asset(
+                                AppAsset.imgAppTextLogo,
+                                colorFilter: ColorFilter.mode(
+                                  theme.colorScheme.onSurface,
+                                  BlendMode.srcIn,
+                                ),
                               ),
-                            ),
-                          ),
-                        FilledButton(
-                          onPressed: _submit,
-                          child: const Text('Sign in'),
+                              const SizedBox(height: 24),
+                            ],
+                            const GlassIcon(svgAsset: AppAsset.icAppIcon),
+                            const SizedBox(height: 24),
+                            _Title(isAddingAccount: viewModel.isAddingAccount),
+                            const SizedBox(height: 24),
+                            _buildForm(context, l10n),
+                          ],
                         ),
-                      ],
-                    );
-                  },
+                      ),
+                    ),
+                    if (!isKeyboardOpen) const _LegalLinks(),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildForm(BuildContext context, AppLocalizations l10n) {
+    final viewModel = context.watch<SignInViewModel>();
+
+    return AuthCardWidget(
+      child: Column(
+        children: [
+          WidgetWithLabel(
+            label: l10n.email,
+            child: TextFieldInput(
+              inputController: _email,
+              hintText: l10n.emailInputHint,
+              keyboardType: TextInputType.emailAddress,
+              maxLength: 100,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
+              inputFormatters: [_LowerCaseFormatter()],
+            ),
+          ),
+          const SizedBox(height: 12),
+          WidgetWithLabel(
+            label: l10n.password,
+            child: TextFieldInput(
+              inputController: _password,
+              hintText: l10n.passwordInputHint,
+              obscureText: true,
+              focusNode: _passwordFocus,
+              onFieldSubmitted: (_) => _submit(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ListenableBuilder(
+            listenable: viewModel.signIn,
+            builder: (context, _) {
+              final running = viewModel.signIn.running;
+              return Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: _isFormValid && !running ? _submit : null,
+                      child: running
+                          ? const SizedBox.square(
+                              dimension: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(l10n.signIn),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      // TODO(task-12): wire SignInPasskeyUseCase.
+                      onPressed: null,
+                      icon: const Icon(Icons.key),
+                      label: Text(l10n.continueWithPasskey),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      // TODO(task-14): open the QR scanner.
+                      onPressed: null,
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: Text(l10n.scanQrCodeAction),
+                    ),
+                  ),
+                  if (viewModel.signIn.error) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      switch (viewModel.signIn.result) {
+                        Error(error: final ApiException e) => e
+                            .localizedMessage(l10n),
+                        _ => l10n.incorrectEmailOrPassword,
+                      },
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  const _Title({required this.isAddingAccount});
+
+  final bool isAddingAccount;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        Text(
+          isAddingAccount ? l10n.addNewAccount : l10n.signIn,
+          style: theme.textTheme.headlineMedium,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          l10n.signInSubtitle,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+class _LegalLinks extends StatelessWidget {
+  const _LegalLinks();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Text(
+        'By signing in you agree to our Terms and Privacy Policy.',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+/// Email addresses are case-insensitive; the server stores them lowercased.
+class _LowerCaseFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(text: newValue.text.toLowerCase());
   }
 }

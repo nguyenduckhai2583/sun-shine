@@ -22,5 +22,12 @@ abstract class SessionRepository {
 
   Future<void> assignWorkspace(String workspaceId);
 
+  /// Replaces the active account's token after a refresh.
+  Future<void> renewToken({
+    required String token,
+    String? refreshToken,
+    int? expireAt,
+  });
+
   Future<void> signOut();
 }

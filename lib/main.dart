@@ -13,11 +13,6 @@ void main() {
           create: (context) =>
               AuthManager(baseUrl: BuildConfig().env.baseApiUrl),
         ),
-        Provider<AuthRepository>(
-          create: (context) => AuthRepositoryImpl(
-            apiClient: context.read<AuthManager>().authApiClient,
-          ),
-        ),
         Provider(
           create: (context) => AuthLocalService(),
           dispose: (context, service) => service.dispose(),
@@ -25,6 +20,19 @@ void main() {
         Provider<SessionRepository>(
           create: (context) =>
               SessionRepositoryImpl(localService: context.read()),
+        ),
+        Provider<AuthRepository>(
+          create: (context) => AuthRepositoryImpl(
+            signInClient: context.read<AuthManager>().authApiClient,
+            sessionClient: Di.observed(
+              AuthApiClient(
+                AppDio.create(
+                  baseUrl: BuildConfig().env.baseApiUrl,
+                  sessionRepository: context.read(),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
       child: const AuthScope(child: MainApp()),

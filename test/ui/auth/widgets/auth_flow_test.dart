@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
 
+import '../../../testing/fakes/fake_auth_api_client.dart';
 import '../../../testing/pump_app.dart';
 
 void main() {
@@ -33,32 +34,69 @@ void main() {
       expect(find.byType(HomeScreen), findsOneWidget);
     });
 
-    testWidgets('signing in from the form reaches home', (tester) async {
+    testWidgets('the sign-in button waits for both fields', (tester) async {
       await pumpApp(tester, signedIn: false);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNull,
+      );
+
+      await tester.enterText(find.byType(TextField).first, 'khai@sunshine.com');
+      await tester.enterText(find.byType(TextField).last, 'password');
+      await tester.pump();
+
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNotNull,
+      );
+    });
+
+    testWidgets('signing in leaves the form for the workspace picker', (
+      tester,
+    ) async {
+      await pumpApp(tester, signedIn: false);
+
+      await tester.enterText(find.byType(TextField).first, 'khai@sunshine.com');
+      await tester.enterText(find.byType(TextField).last, 'password');
+      await tester.pump();
+      // The form scrolls; the button sits below the fold at test size.
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(find.byType(HomeScreen), findsOneWidget);
-      expect(find.widgetWithText(ListTile, '#general'), findsOneWidget);
+      // The sign-in response carries no workspace, so the redirect sends the
+      // user to pick one rather than into the app.
+      expect(find.byType(SignInScreen), findsNothing);
+      expect(find.text('Workspace'), findsOneWidget);
     });
 
     testWidgets('bad credentials keep the user on the form', (tester) async {
-      await pumpApp(tester, signedIn: false);
+      await pumpApp(
+        tester,
+        signedIn: false,
+        authApi: FakeAuthApiClient()
+          ..signInResult = const Result.error(
+            ApiException(
+              error: ApiErrorEnum.server,
+              serverMessage: 'Invalid credentials',
+              statusCode: 401,
+            ),
+          ),
+      );
 
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Email'),
-        'nope@sunshine.com',
-      );
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Password'),
-        '',
-      );
-      await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+      await tester.enterText(find.byType(TextField).first, 'nope@sunshine.com');
+      await tester.enterText(find.byType(TextField).last, 'wrong');
+      await tester.pump();
+      // The form scrolls; the button sits below the fold at test size.
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
+      expect(find.text('Invalid credentials'), findsOneWidget);
       expect(find.byType(SignInScreen), findsOneWidget);
-      expect(find.text('Password is required'), findsOneWidget);
     });
   });
 
