@@ -8,8 +8,27 @@ class SignInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider(
+          create: (context) => SignInUseCase(
+            authManager: context.read(),
+            authRepository: context.read(),
+          ),
+        ),
+        Provider(
+          create: (context) => SignInFlowUseCase(authManager: context.read()),
+        ),
+        Provider(
+          create: (context) => FinalizeSessionUseCase(
+            authManager: context.read(),
+            sessionRepository: context.read(),
+          ),
+        ),
         ChangeNotifierProvider(
-          create: (context) => SignInViewModel(authRepository: context.read()),
+          create: (context) => SignInViewModel(
+            signInUseCase: context.read(),
+            signInFlowUseCase: context.read(),
+            finalizeSessionUseCase: context.read(),
+          ),
         ),
       ],
       child: const _SignInView(),

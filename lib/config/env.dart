@@ -21,7 +21,7 @@ class DevEnv extends Env {
   String get name => 'dev';
 
   @override
-  String get baseApiUrl => 'https://api.dev.sunshine.com';
+  String get baseApiUrl => 'https://employer-api.dev.hodfords.uk/';
 
   @override
   String get dbName => 'sun_shine_dev';
@@ -34,7 +34,7 @@ class ProdEnv extends Env {
   String get name => 'prod';
 
   @override
-  String get baseApiUrl => 'https://api.sunshine.com';
+  String get baseApiUrl => 'https://api.hplix.com/';
 
   @override
   String get dbName => 'sun_shine';

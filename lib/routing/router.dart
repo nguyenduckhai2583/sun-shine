@@ -12,7 +12,7 @@ final _dmsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'dms');
 final _moreNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'more');
 
 GoRouter createRouter({
-  required AuthRepository authRepository,
+  required SessionRepository sessionRepository,
   String initialLocation = Routes.home,
   bool debugLogDiagnostics = false,
 }) {
@@ -22,7 +22,7 @@ GoRouter createRouter({
     debugLogDiagnostics: debugLogDiagnostics,
     errorBuilder: (context, state) => ErrorScreen(error: state.error),
     redirect: (context, state) {
-      final signedIn = authRepository.isSignedIn;
+      final signedIn = sessionRepository.isSignedIn;
       final goingToSignIn = state.matchedLocation == Routes.signIn;
       if (!signedIn) return goingToSignIn ? null : Routes.signIn;
       return goingToSignIn ? Routes.home : null;

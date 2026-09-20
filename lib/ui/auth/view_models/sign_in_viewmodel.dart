@@ -3,16 +3,50 @@ import 'package:sun_shine/core.dart';
 typedef Credentials = ({String email, String password});
 
 class SignInViewModel extends BaseViewModel {
-  SignInViewModel({required AuthRepository authRepository})
-    : _authRepository = authRepository {
+  SignInViewModel({
+    required SignInUseCase signInUseCase,
+    required SignInFlowUseCase signInFlowUseCase,
+    required FinalizeSessionUseCase finalizeSessionUseCase,
+  }) : _signInUseCase = signInUseCase,
+       _signInFlowUseCase = signInFlowUseCase,
+       _finalizeSessionUseCase = finalizeSessionUseCase {
     signIn = Command1(_signIn);
+    _isAddingAccount = _signInFlowUseCase.isAddingAccount;
   }
 
-  final AuthRepository _authRepository;
+  final SignInUseCase _signInUseCase;
+  final SignInFlowUseCase _signInFlowUseCase;
+  final FinalizeSessionUseCase _finalizeSessionUseCase;
 
-  late final Command1<Session, Credentials> signIn;
+  /// Completes with `true` when the server issued a temporary token, meaning
+  /// the user still owes a second factor and the caller must route there
+  /// rather than treat the sign-in as done.
+  late final Command1<bool, Credentials> signIn;
 
-  Future<Result<Session>> _signIn(Credentials credentials) {
-    return _authRepository.signIn(credentials.email, credentials.password);
+  late final bool _isAddingAccount;
+
+  /// Captured at construction: finalize ends the flow, so the live flag is
+  /// already false by the time the view decides how to route.
+  bool get isAddingAccount => _isAddingAccount;
+
+  void cancel() => _signInFlowUseCase.cancel();
+
+  Future<Result<bool>> _signIn(Credentials credentials) async {
+    final result = await _signInUseCase.signIn(
+      email: credentials.email.trim(),
+      password: credentials.password,
+    );
+
+    switch (result) {
+      case Error(:final error):
+        return Result.error(error);
+      case Ok(value: final needsSecondFactor):
+        if (needsSecondFactor) return const Result.ok(true);
+        final finalized = await _finalizeSessionUseCase.execute();
+        return switch (finalized) {
+          Ok() => const Result.ok(false),
+          Error(:final error) => Result.error(error),
+        };
+    }
   }
 }

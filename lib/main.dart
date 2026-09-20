@@ -9,16 +9,22 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        Provider(create: (context) => AuthApiClient()),
+        Provider(
+          create: (context) =>
+              AuthManager(baseUrl: BuildConfig().env.baseApiUrl),
+        ),
+        Provider<AuthRepository>(
+          create: (context) => AuthRepositoryImpl(
+            apiClient: context.read<AuthManager>().authApiClient,
+          ),
+        ),
         Provider(
           create: (context) => AuthLocalService(),
           dispose: (context, service) => service.dispose(),
         ),
-        Provider<AuthRepository>(
-          create: (context) => AuthRepositoryImpl(
-            apiClient: context.read(),
-            localService: context.read(),
-          ),
+        Provider<SessionRepository>(
+          create: (context) =>
+              SessionRepositoryImpl(localService: context.read()),
         ),
       ],
       child: const AuthScope(child: MainApp()),
@@ -40,7 +46,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     _router = createRouter(
-      authRepository: context.read<AuthRepository>(),
+      sessionRepository: context.read<SessionRepository>(),
       debugLogDiagnostics: BuildConfig().isDebug,
     );
   }

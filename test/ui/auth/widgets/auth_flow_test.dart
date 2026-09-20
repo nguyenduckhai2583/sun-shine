@@ -112,7 +112,9 @@ void main() {
       await tester.tap(find.widgetWithText(ListTile, 'Sign out'));
       await tester.pumpAndSettle();
 
-      await auth.signIn('someone-else@sunshine.com', 'password');
+      await auth.adoptSession(
+        fakeSession(userId: 'u2', email: 'someone-else@sunshine.com'),
+      );
       await tester.pumpAndSettle();
 
       final secondService = tester

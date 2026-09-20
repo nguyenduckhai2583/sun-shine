@@ -31,10 +31,12 @@ void main() {
   testWidgets('every layer logs on creation', (tester) async {
     await pumpApp(tester);
 
+    // AuthApiClient is absent on purpose: the harness fakes it, and a fake
+    // is not a layer this observer is meant to see.
     for (final type in [
-      'AuthApiClient',
       'AuthLocalService',
       'AuthRepositoryImpl',
+      'SessionRepositoryImpl',
       'ChannelApiClient',
       'ChannelLocalService',
       'ChannelRepositoryImpl',

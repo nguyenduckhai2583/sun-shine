@@ -11,7 +11,7 @@ class HomeDrawer extends StatelessWidget {
 
   Future<void> _onSignOut(BuildContext context) async {
     Scaffold.of(context).closeDrawer();
-    await context.read<AuthRepository>().signOut();
+    await context.read<SessionRepository>().signOut();
   }
 
   @override

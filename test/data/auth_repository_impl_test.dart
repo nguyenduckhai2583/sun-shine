@@ -1,84 +1,100 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sun_shine/core.dart';
 
+import '../testing/fakes/fake_auth_api_client.dart';
+
 void main() {
   group('AuthRepositoryImpl', () {
-    late AuthLocalService localService;
+    late FakeAuthApiClient apiClient;
     late AuthRepositoryImpl repository;
 
+    const request = AuthRequest(
+      email: 'khai@sunshine.com',
+      sha1Password: 'digest',
+    );
+
     setUp(() {
-      localService = AuthLocalService();
-      repository = AuthRepositoryImpl(
-        apiClient: AuthApiClient(),
-        localService: localService,
-      );
-      addTearDown(localService.dispose);
+      apiClient = FakeAuthApiClient();
+      repository = AuthRepositoryImpl(apiClient: apiClient);
     });
 
-    test('starts signed out', () {
-      expect(repository.isSignedIn, isFalse);
-      expect(repository.currentSession, isNull);
-    });
-
-    test('signIn stores the session', () async {
-      final result = await repository.signIn('khai@sunshine.com', 'password');
-
-      expect(result, isA<Ok<Session>>());
-      expect(repository.isSignedIn, isTrue);
-      expect(repository.currentSession?.user?.email, 'khai@sunshine.com');
-    });
-
-    test('rejects invalid credentials', () async {
-      final result = await repository.signIn('not-an-email', 'password');
-
-      expect(result, isA<Error<Session>>());
-      expect(
-        (result as Error<Session>).error,
-        isA<InvalidCredentialsException>(),
-      );
-      expect(repository.isSignedIn, isFalse);
-    });
-
-    test('rejects an empty password', () async {
-      final result = await repository.signIn('khai@sunshine.com', '');
-
-      expect(result, isA<Error<Session>>());
-      expect(repository.isSignedIn, isFalse);
-    });
-
-    test('signOut clears the session', () async {
-      await repository.signIn('khai@sunshine.com', 'password');
-      await repository.signOut();
-
-      expect(repository.isSignedIn, isFalse);
-      expect(repository.currentSession, isNull);
-    });
-
-    test('the session stream emits sign-in then sign-out', () async {
-      expect(
-        repository.session,
-        emitsInOrder([
-          null,
-          isA<Session>().having(
-            (s) => s.user?.email,
-            'email',
-            'khai@sunshine.com',
+    test('maps the API session onto the domain model', () async {
+      apiClient.signInResult = const Result.ok(
+        SessionApiModel(
+          token: 'tok',
+          refreshToken: 'refresh',
+          expireAt: 123,
+          user: UserApiModel(
+            id: 'u1',
+            email: 'khai@sunshine.com',
+            fullName: 'Khai',
           ),
-          null,
-        ]),
+        ),
       );
 
-      await repository.signIn('khai@sunshine.com', 'password');
-      await repository.signOut();
+      final result = await repository.signInRemote(request);
+
+      final session = (result as Ok<Session>).value;
+      expect(session.userId, 'u1');
+      expect(session.token, 'tok');
+      expect(session.refreshToken, 'refresh');
+      expect(session.expireAt, 123);
+      expect(session.user?.fullName, 'Khai');
     });
 
-    test('different users get different ids', () async {
-      await repository.signIn('a@sunshine.com', 'password');
-      final first = repository.currentSession!.userId;
-      await repository.signOut();
-      await repository.signIn('b@sunshine.com', 'password');
+    test('passes the request through untouched', () async {
+      await repository.signInRemote(request);
 
-      expect(repository.currentSession!.userId, isNot(first));
+      expect(apiClient.lastRequest?.email, 'khai@sunshine.com');
+      expect(apiClient.lastRequest?.sha1Password, 'digest');
+    });
+
+    test('a temporary token survives the mapping', () async {
+      apiClient.signInResult = const Result.ok(
+        SessionApiModel(
+          token: 'tmp',
+          isTmpToken: true,
+          user: UserApiModel(id: 'u1', email: 'khai@sunshine.com'),
+        ),
+      );
+
+      final result = await repository.signInRemote(request);
+
+      expect((result as Ok<Session>).value.isTmpToken, isTrue);
+    });
+
+    test('defaults isTmpToken to false when the server omits it', () async {
+      final result = await repository.signInRemote(request);
+
+      expect((result as Ok<Session>).value.isTmpToken, isFalse);
+    });
+
+    test('passes a failure through as-is', () async {
+      apiClient.signInResult = const Result.error(
+        ApiException(
+          error: ApiErrorEnum.server,
+          serverMessage: 'Invalid credentials',
+          statusCode: 401,
+        ),
+      );
+
+      final result = await repository.signInRemote(request);
+
+      expect(result, isA<Error<Session>>());
+      final error = (result as Error<Session>).error as ApiException;
+      expect(error.serverMessage, 'Invalid credentials');
+    });
+
+    test('maps the profile onto the domain user', () async {
+      final result = await repository.getMyProfileRemote();
+
+      expect((result as Ok<User>).value.email, 'khai@sunshine.com');
+    });
+
+    test('signOut reaches the API', () async {
+      await repository.signOutRemote();
+
+      expect(apiClient.signOutCount, 1);
     });
   });
 }

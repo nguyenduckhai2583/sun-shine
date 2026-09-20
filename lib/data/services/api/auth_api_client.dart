@@ -1,37 +1,24 @@
+import 'package:dio/dio.dart';
+import 'package:retrofit/retrofit.dart';
 import 'package:sun_shine/core.dart';
 
-class InvalidCredentialsException implements Exception {
-  const InvalidCredentialsException();
+part 'auth_api_client.g.dart';
 
-  @override
-  String toString() => 'InvalidCredentialsException()';
-}
+/// `baseUrl` here is only the path prefix — the host comes from
+/// `Dio.options.baseUrl`, so the environment stays a runtime value.
+///
+/// Every method returns a [Result] rather than throwing, because
+/// [ResultCallAdapter] wraps each generated call.
+@RestApi(baseUrl: '/user-services', callAdapter: ResultCallAdapter)
+abstract class AuthApiClient {
+  factory AuthApiClient(Dio dio, {String? baseUrl}) = _AuthApiClient;
 
-class AuthApiClient extends BaseApiClient {
-  Future<Result<SessionApiModel>> signIn(String email, String password) async {
-    try {
-      if (!email.contains('@') || password.isEmpty) {
-        return const Result.error(InvalidCredentialsException());
-      }
-      return Result.ok(
-        SessionApiModel(
-          token: 'token_${email.hashCode}',
-          user: UserApiModel(
-            id: 'user_${email.split('@').first}',
-            email: email,
-          ),
-        ),
-      );
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
+  @POST('/auth/sign-in')
+  Future<Result<SessionApiModel>> signIn(@Body() AuthRequest request);
 
-  Future<Result<void>> signOut() async {
-    try {
-      return const Result.ok(null);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
+  @GET('/users/me')
+  Future<Result<UserApiModel>> getMyProfile();
+
+  @DELETE('/auth/sign-out')
+  Future<Result<void>> signOut();
 }

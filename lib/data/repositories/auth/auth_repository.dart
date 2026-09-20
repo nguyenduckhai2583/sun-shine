@@ -1,13 +1,13 @@
 import 'package:sun_shine/core.dart';
 
+/// The HTTP facade for authentication.
+///
+/// It holds no session state: which account is signed in, and which of several
+/// is active, belongs to `SessionRepository`.
 abstract class AuthRepository {
-  Stream<Session?> get session;
+  Future<Result<Session>> signInRemote(AuthRequest request);
 
-  Session? get currentSession;
+  Future<Result<User>> getMyProfileRemote();
 
-  bool get isSignedIn;
-
-  Future<Result<Session>> signIn(String email, String password);
-
-  Future<Result<void>> signOut();
+  Future<Result<void>> signOutRemote();
 }
