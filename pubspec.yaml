@@ -43,6 +43,9 @@ dependencies:
   collection: ^1.19.1
   dio: ^5.11.1
   retrofit: ^4.10.0
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -69,6 +72,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Generates AppLocalizations from lib/l10n/*.arb on `pub get`.
+  generate: true
 
   # To add assets to your application, add an assets section, like this:
   # assets:

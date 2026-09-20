@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+
+  "signIn": "Sign in",
+  "signInSubtitle": "Start a new conversation with the team",
+  "addNewAccount": "Add new account",
+  "email": "Email",
+  "emailInputHint": "Your email address here",
+  "password": "Password",
+  "passwordInputHint": "Enter the password",
+  "incorrectEmailOrPassword": "Your email address and/or password are incorrect.",
+  "continueWithPasskey": "Continue with Passkey",
+  "scanQrCodeAction": "Scan QR code",
+  "processing": "Processing",
+  "cancel": "Cancel",
+
+  "somethingWentWrong": "Something went wrong",
+  "noInternetConnection": "No internet connection",
+  "requestTimeOut": "Request timed out. Please check your connection.",
+  "requestCancelled": "The request was cancelled",
+  "badResponseFormat": "Bad response format",
+  "incorrectCertificate": "Incorrect certificate as configured"
+}
