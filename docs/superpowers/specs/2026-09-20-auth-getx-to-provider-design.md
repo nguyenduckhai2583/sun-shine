@@ -104,6 +104,7 @@ arrive through the constructor.
 | 6 | `Di.observed<T>()` helper for API clients | Retrofit generates `implements`, never `extends`, so `BaseApiClient`'s constructor cannot run |
 | 7 | `RepositoryImpl`, not `RepositoryRemote` | Applied 2026-09-20; analyze clean, 116 tests pass |
 | 8 | Port the shared widgets; gen-l10n from the start | Screen 1 lays the UI foundation every later screen reuses |
+| 8b | Ship **English only** | Employer's `intl_vi.arb` holds 124 of 1863 keys and **none** of the auth ones — there is no Vietnamese auth copy to port. `app_vi.arb` is added when translations exist |
 | 9 | Keep Isar for session persistence | Multi-account model is built on Isar queries; replacing it is a rewrite, not a port |
 | 9b | Split employer's `SessionRepository` into a local service + a repository | Employer's `SessionRepository extends BaseLocalService<SessionModel>` — it *is* the Isar layer. sun-shine's layering keeps Isar in `data/services/local/` and puts the domain-facing API in `data/repositories/`. This is a deliberate re-layering, not a straight port |
 | 10 | Copy `flutter_passkey_service` plugin into sun-shine | It is a patched local fork; a cross-repo relative path breaks CI |
@@ -144,7 +145,7 @@ lib/
 │       ├── view_models/ sign_in_viewmodel.dart
 │       └── widgets/     sign_in_screen.dart, auth_card.dart,
 │                        glass_icon.dart, qr_waiting_dialog.dart
-├── l10n/               app_en.arb, app_vi.arb  (~32 auth keys)
+├── l10n/               app_en.arb  (~32 auth keys; see note)
 └── utils/di.dart       + Di.observed<T>()
 assets/svg/             ic_app_icon.svg, img_app_text_logo.svg
 plugins/flutter_passkey_service/   copied from employer-mobile
@@ -201,7 +202,7 @@ reproduced here.
 
 | Slice | Pulls in |
 |---|---|
-| foundation | retrofit + Dio stack, `ApiException`, `Di.observed`, Isar, gen-l10n (~32 keys), 6 shared widgets, 2 SVGs |
+| foundation | retrofit + Dio stack, `ApiException`, `Di.observed`, Isar, gen-l10n (~32 EN keys), 6 shared widgets, 2 SVGs |
 | password | `SignInUseCase`, `AuthRepository`, `AuthApiClient`, `AuthManager` |
 | passkey | `PasskeyService`, `LocalPrivateKeyUseCase`, `DeviceKeyStore`, copied plugin |
 | QR | `QrShareRepository`, trimmed `SocketService`, scanner view, waiting dialog |
@@ -226,7 +227,10 @@ Mirrors the existing suite under `test/`:
   timeout → 408
 - Router redirect tests via `createRouter(initialLocation: ...)` covering
   signed-out, signed-in-no-workspace, signed-in-with-workspace
-- Widget test for `SignInScreen`: validation, `Command.running`, error display
+
+**No widget tests.** Coverage stops at the ViewModel: a `Command`'s `running`,
+`error`, and `result` are asserted directly, and the screens are verified by
+running the app.
 
 ## Out of scope
 
