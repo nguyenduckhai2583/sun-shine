@@ -7,7 +7,12 @@ class PlanixProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: planixProjectsProviders,
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) =>
+              PlanixProjectsViewModel(projectRepository: context.read()),
+        ),
+      ],
       child: const _PlanixProjectsView(),
     );
   }

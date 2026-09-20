@@ -9,7 +9,17 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: homeProviders,
+      providers: [
+        Provider(create: (context) => WorkspaceApiClient()),
+        Provider<WorkspaceRepository>(
+          create: (context) =>
+              WorkspaceRepositoryImpl(apiClient: context.read()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              HomeViewModel(workspaceRepository: context.read()),
+        ),
+      ],
       child: _HomeScaffold(navigationShell: navigationShell),
     );
   }

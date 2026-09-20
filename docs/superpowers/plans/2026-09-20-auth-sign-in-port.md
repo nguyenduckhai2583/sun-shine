@@ -17,11 +17,12 @@
 - Always use `fvm`: `fvm flutter analyze`, `fvm flutter test`, `fvm dart run build_runner build --delete-conflicting-outputs`.
 - **Import `package:material_ui/material_ui.dart`, never `package:flutter/material.dart`.** Non-widget code may import `package:flutter/foundation.dart`.
 - Import project code through the barrel `package:sun_shine/core.dart`. Add every new public file to its layer barrel (`lib/data/data.dart`, `lib/domain/domain.dart`, `lib/ui/ui.dart`, `lib/utils/utils.dart`).
-- Generated `*.freezed.dart` / `*.g.dart` are committed. Never hand-edit them.
+- Generated `*.freezed.dart` / `*.g.dart` are checked into the repo. Never hand-edit them.
 - Async actions that can fail use `Command<T>` from `lib/utils/command.dart`, never a manual `isLoading` bool.
 - Repositories are abstract + `<Name>RepositoryImpl`. ViewModels extend `BaseViewModel`. Local services extend `BaseLocalService`.
 - `Result.error` takes an `Exception`. Never a bare `String`.
-- Run `fvm flutter analyze` before every commit; it must report **No issues found!**
+- Write `providers:` lists inline at the `MultiProvider` that mounts them. No `<feature>_providers.dart` files.
+- Run `fvm flutter analyze` at the end of every task; it must report **No issues found!**
 - Base URLs: dev `https://employer-api.dev.hodfords.uk/`, prod `https://api.hplix.com/`.
 - API path prefix for auth: `/user-services/auth`. Profile: `/user-services/users/me`.
 
@@ -73,7 +74,7 @@
 | `lib/ui/auth/widgets/sign_in_screen.dart` (modify) | The screen |
 | `lib/ui/auth/widgets/auth_card.dart` | Card container |
 | `lib/ui/auth/widgets/glass_icon.dart` | Frosted app icon |
-| `lib/ui/auth/auth_providers.dart` (modify) | Scope registrations |
+| `lib/main.dart` (modify) | Auth scope registrations, written inline |
 
 **Shared UI**
 
@@ -426,7 +427,7 @@ Add to `lib/data/data.dart`:
 export 'services/api/client/dio_factory.dart';
 ```
 
-- [ ] **Step 13: Verify the whole suite and commit**
+- [ ] **Step 13: Verify the whole suite**
 
 ```bash
 fvm flutter analyze
@@ -434,13 +435,6 @@ fvm flutter test
 ```
 
 Expected: **No issues found!** and all tests pass (116 existing + 8 new).
-
-```bash
-git add pubspec.yaml pubspec.lock lib/ test/
-git commit -m "feat(data): add dio + retrofit foundation with Result call adapter
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
-```
 
 ---
 
@@ -526,14 +520,10 @@ fvm flutter analyze
 
 Expected: **No issues found!** (`flutter pub get` runs gen-l10n when `generate: true`).
 
-- [ ] **Step 6: Run and commit**
+- [ ] **Step 6: Verify**
 
 ```bash
 fvm flutter analyze
-git add pubspec.yaml pubspec.lock l10n.yaml lib/ test/
-git commit -m "feat(l10n): set up gen-l10n with the auth strings
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -633,15 +623,11 @@ export 'ui/text_field_input.dart';
 export 'ui/widget_with_label.dart';
 ```
 
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 5: Verify**
 
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add pubspec.yaml pubspec.lock assets/ lib/ test/
-git commit -m "feat(ui): port the shared auth widgets and app SVGs
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -858,7 +844,7 @@ export 'services/api/model/user_api_model.dart';
 Run: `fvm flutter test test/domain/session_test.dart`
 Expected: PASS (3 tests).
 
-- [ ] **Step 7: Fix the fallout and commit**
+- [ ] **Step 7: Fix the fallout**
 
 `Session` gained required fields, so existing call sites break. Run
 `fvm flutter analyze` and fix each error — `AuthRepositoryImpl._toDomain`,
@@ -867,10 +853,6 @@ Expected: PASS (3 tests).
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/
-git commit -m "feat(domain): split Session and User into domain and API models
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -970,7 +952,8 @@ fvm flutter analyze
 ```
 
 The old fake `AuthApiClient()` had a zero-argument constructor; `analyze` will
-now flag `lib/config/auth_providers.dart` and `test/data/auth_repository_impl_test.dart`.
+now flag `lib/main.dart`, `test/testing/pump_app.dart`, and
+`test/data/auth_repository_impl_test.dart`.
 Leave those failing until Task 6 — or stub them with
 `AuthApiClient(DioFactory.create(baseUrl: ''))` to keep analyze green.
 
@@ -1099,7 +1082,7 @@ class AuthManager {
 }
 ```
 
-- [ ] **Step 7: Export, run, commit**
+- [ ] **Step 7: Export and verify**
 
 Add to `lib/data/data.dart`:
 
@@ -1110,10 +1093,6 @@ export 'repositories/auth/auth_manager.dart';
 ```bash
 fvm flutter test test/data/auth_manager_test.dart
 fvm flutter analyze
-git add lib/ test/ _env/
-git commit -m "feat(data): add retrofit AuthApiClient and the sign-in scoped AuthManager
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -1510,7 +1489,7 @@ class SignInFlowUseCase {
 }
 ```
 
-- [ ] **Step 11: Export, run, commit**
+- [ ] **Step 11: Export and verify**
 
 Add to `lib/domain/domain.dart`:
 
@@ -1522,10 +1501,6 @@ export 'use_cases/auth/sign_in_use_case.dart';
 ```bash
 fvm flutter test test/domain/sign_in_use_case_test.dart
 fvm flutter analyze
-git add lib/ test/ pubspec.yaml pubspec.lock
-git commit -m "feat(domain): add SignInUseCase with client-side password hashing
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -1536,7 +1511,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 - Modify: `lib/ui/auth/view_models/sign_in_viewmodel.dart`
 - Modify: `lib/ui/auth/widgets/sign_in_screen.dart`
 - Create: `lib/ui/auth/widgets/auth_card.dart`, `lib/ui/auth/widgets/glass_icon.dart`
-- Modify: `lib/ui/auth/auth_providers.dart`, `lib/config/auth_providers.dart`, `lib/ui/auth/auth.dart`
+- Modify: `lib/main.dart`, `test/testing/pump_app.dart`, `lib/ui/auth/auth.dart`
 - Test: `test/ui/auth/view_models/sign_in_viewmodel_test.dart`
 
 **Interfaces:**
@@ -1684,7 +1659,7 @@ Port `employer:lib/app/modules/auth/sign_in/widgets/auth_card.dart` to
 
 Port the layout from `employer:lib/app/modules/auth/sign_in/views/sign_in_view.dart`
 into `lib/ui/auth/widgets/sign_in_screen.dart`, keeping the existing
-`SignInScreen` → `MultiProvider(providers: signInProviders)` → `_SignInView`
+`SignInScreen` → `MultiProvider(providers: [...])` → `_SignInView`
 shape. Required changes from employer's version:
 
 | Employer | Here |
@@ -1717,53 +1692,62 @@ if (viewModel.signIn.error)
 
 - [ ] **Step 7: Update the provider scopes**
 
-Replace `lib/ui/auth/auth_providers.dart`:
+Providers are written inline at the `MultiProvider` that mounts them — this
+repo has no `<feature>_providers.dart` indirection.
+
+In `lib/ui/auth/widgets/sign_in_screen.dart`, the `SignInScreen` wrapper
+becomes:
 
 ```dart
-import 'package:provider/single_child_widget.dart';
-import 'package:sun_shine/core.dart';
+class SignInScreen extends StatelessWidget {
+  const SignInScreen({super.key});
 
-List<SingleChildWidget> get signInProviders {
-  return [
-    Provider(
-      create: (context) =>
-          SignInUseCase(
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        Provider(
+          create: (context) => SignInUseCase(
             authManager: context.read(),
             authRepository: context.read(),
           ),
-    ),
-    Provider(
-      create: (context) => SignInFlowUseCase(authManager: context.read()),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => SignInViewModel(
-        signInUseCase: context.read(),
-        signInFlowUseCase: context.read(),
-      ),
-    ),
-  ];
+        ),
+        Provider(
+          create: (context) => SignInFlowUseCase(authManager: context.read()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => SignInViewModel(
+            signInUseCase: context.read(),
+            signInFlowUseCase: context.read(),
+          ),
+        ),
+      ],
+      child: const _SignInView(),
+    );
+  }
 }
 ```
 
-Replace the body of `lib/config/auth_providers.dart`:
+In `lib/main.dart`, replace the auth-scope list that currently registers
+`AuthApiClient` / `AuthLocalService` with:
 
 ```dart
-List<SingleChildWidget> get authProviders {
-  return [
-    Provider(
-      create: (context) =>
-          AuthManager(baseUrl: BuildConfig().env.baseApiUrl),
-    ),
-    Provider<AuthRepository>(
-      create: (context) => AuthRepositoryImpl(
-        apiClient: Di.observed(context.read<AuthManager>().authApiClient),
-      ),
-    ),
-  ];
-}
+      providers: [
+        Provider(
+          create: (context) => AuthManager(baseUrl: BuildConfig().env.baseApiUrl),
+        ),
+        Provider<AuthRepository>(
+          create: (context) => AuthRepositoryImpl(
+            apiClient: Di.observed(context.read<AuthManager>().authApiClient),
+          ),
+        ),
+      ],
 ```
 
-- [ ] **Step 8: Run everything and commit**
+Mirror the same change in `test/testing/pump_app.dart`, which builds the auth
+scope by hand so tests boot the real tree.
+
+- [ ] **Step 8: Verify**
 
 ```bash
 fvm flutter analyze
@@ -1771,13 +1755,6 @@ fvm flutter test
 ```
 
 Expected: **No issues found!**, all tests pass.
-
-```bash
-git add lib/ test/
-git commit -m "feat(auth): port the Sign In screen for the password path
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
-```
 
 **Checkpoint:** the password path now runs end to end against the real API. Verify manually before continuing:
 
@@ -1979,7 +1956,7 @@ row and sets it on the matching one. `watchAll()` / `watchActive()` wrap
 Extend `BaseLocalService` so `Di` observes it, and close any stream
 controller in `dispose()`.
 
-- [ ] **Step 6: Generate, run, commit**
+- [ ] **Step 6: Generate and verify**
 
 ```bash
 fvm dart run build_runner build --delete-conflicting-outputs
@@ -1995,10 +1972,6 @@ Delete `lib/data/services/local/auth_local_service.dart` and its export from
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/ pubspec.yaml pubspec.lock
-git commit -m "feat(data): persist multi-account sessions in Isar
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -2008,7 +1981,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 **Files:**
 - Create: `lib/data/repositories/auth/session_repository.dart`, `session_repository_impl.dart`
 - Create: `lib/domain/use_cases/auth/finalize_session_use_case.dart`
-- Modify: `lib/data/data.dart`, `lib/domain/domain.dart`, `lib/config/auth_providers.dart`
+- Modify: `lib/data/data.dart`, `lib/domain/domain.dart`, `lib/main.dart`
 - Create: `test/testing/fakes/fake_session_repository.dart`
 - Test: `test/data/session_repository_impl_test.dart`, `test/domain/finalize_session_use_case_test.dart`
 
@@ -2105,18 +2078,14 @@ Employer's version also registered FCM and VoIP tokens when adding an account
 and loaded workspaces. Both are out of scope here — workspace selection is its
 own screen, and push registration arrives with the notifications module.
 
-- [ ] **Step 6: Register, run, commit**
+- [ ] **Step 6: Register and verify**
 
 Add `SessionLocalService`, `SessionRepository`, and `FinalizeSessionUseCase` to
-`lib/config/auth_providers.dart`, giving the local service a `dispose:`.
+the auth scope in `lib/main.dart`, giving the local service a `dispose:`.
 
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/
-git commit -m "feat(data): add SessionRepository and finalize the sign-in handoff
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -2304,20 +2273,12 @@ In `lib/ui/auth/widgets/auth_scope.dart`, switch the `StreamBuilder` from
 `authRepository.session` to `sessionRepository.activeSession` and keep the
 `ValueKey(userId)` — that is what disposes a signed-out account's scope.
 
-- [ ] **Step 6: Run and commit**
+- [ ] **Step 6: Verify**
 
 ```bash
 fvm flutter test test/routing/router_test.dart
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/
-git commit -m "fix(routing): re-run the redirect when the session changes
-
-The redirect read isSignedIn but the router was built once in initState with
-no refreshListenable, so a successful sign-in never moved the user off the
-sign-in screen.
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 **Checkpoint:** sign in with a real account and confirm the app navigates to the workspace placeholder on its own.
@@ -2413,15 +2374,11 @@ plain `flutter_secure_storage` wrapper with no GetX.
 
 Write `PasskeyApiClient` as a retrofit client per the interface above.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Verify**
 
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add plugins/ lib/ test/ pubspec.yaml pubspec.lock
-git commit -m "feat(auth): add the passkey plugin, service, and key store
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -2432,7 +2389,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 - Create: `lib/domain/use_cases/auth/sign_in_passkey_use_case.dart`
 - Create: `lib/domain/use_cases/auth/local_private_key_use_case.dart`
 - Modify: `lib/ui/auth/view_models/sign_in_viewmodel.dart`
-- Modify: `lib/ui/auth/widgets/sign_in_screen.dart`, `lib/ui/auth/auth_providers.dart`
+- Modify: `lib/ui/auth/widgets/sign_in_screen.dart`
 - Test: `test/domain/sign_in_passkey_use_case_test.dart`, extend `test/ui/auth/view_models/sign_in_viewmodel_test.dart`
 
 **Interfaces:**
@@ -2480,15 +2437,11 @@ In `sign_in_screen.dart`, replace the passkey button's `onPressed: null` with a
 call guarded on a valid email, and hide the error text when the failure is a
 `PasskeyCancelledException`.
 
-- [ ] **Step 6: Run and commit**
+- [ ] **Step 6: Verify**
 
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/
-git commit -m "feat(auth): wire passkey sign-in into the Sign In screen
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -2535,16 +2488,12 @@ From `employer:lib/app/modules/qr_login/`: `models/qr_share_payload.dart`,
 `models/qr_share_event.dart`, `services/qr_share_http_service.dart` (rewritten
 as a retrofit `QrShareApiClient`), and the socket methods listed above.
 
-- [ ] **Step 4: Run and commit**
+- [ ] **Step 4: Verify**
 
 ```bash
 fvm dart run build_runner build --delete-conflicting-outputs
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/ pubspec.yaml pubspec.lock
-git commit -m "feat(data): add the QR share client and the socket slice it needs
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
@@ -2555,7 +2504,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 - Create: `lib/domain/use_cases/auth/sign_in_qr_use_case.dart`
 - Create: `lib/ui/auth/widgets/qr_scanner_screen.dart`, `qr_waiting_dialog.dart`
 - Modify: `lib/routing/routes.dart`, `lib/routing/router.dart`
-- Modify: `lib/ui/auth/view_models/sign_in_viewmodel.dart`, `sign_in_screen.dart`, `auth_providers.dart`
+- Modify: `lib/ui/auth/view_models/sign_in_viewmodel.dart`, `sign_in_screen.dart`
 - Modify: `ios/Runner/Info.plist`, `android/app/src/main/AndroidManifest.xml`
 - Test: `test/domain/sign_in_qr_use_case_test.dart`
 
@@ -2602,15 +2551,11 @@ Replace the QR button's `onPressed: null` with
 `context.push<QrSharePayload>(Routes.qrScanner)`, then show the waiting dialog
 and run `signInWithQr` with the scanned payload.
 
-- [ ] **Step 6: Run and commit**
+- [ ] **Step 6: Verify**
 
 ```bash
 fvm flutter analyze
 fvm flutter test
-git add lib/ test/ ios/ android/
-git commit -m "feat(auth): wire QR sign-in into the Sign In screen
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
 
 **Checkpoint:** all three sign-in paths work against the dev API on a real device. Screen 1 is done.

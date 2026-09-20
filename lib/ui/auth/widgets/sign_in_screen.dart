@@ -7,7 +7,11 @@ class SignInScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: signInProviders,
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => SignInViewModel(authRepository: context.read()),
+        ),
+      ],
       child: const _SignInView(),
     );
   }

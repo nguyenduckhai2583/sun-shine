@@ -9,7 +9,14 @@ class ChannelDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: channelDetailProviders(channelId),
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => ChannelDetailViewModel(
+            channelId: channelId,
+            channelRepository: context.read(),
+          ),
+        ),
+      ],
       child: const _ChannelDetailView(),
     );
   }

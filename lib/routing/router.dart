@@ -37,7 +37,22 @@ GoRouter createRouter({
       // shell is the only ancestor both reach; popping it disposes the scope.
       ShellRoute(
         builder: (context, state, child) =>
-            MultiProvider(providers: planixModuleProviders, child: child),
+            MultiProvider(
+              providers: [
+                Provider(create: (context) => ProjectApiClient()),
+                Provider(
+                  create: (context) => ProjectLocalService(),
+                  dispose: (context, service) => service.dispose(),
+                ),
+                Provider<ProjectRepository>(
+                  create: (context) => ProjectRepositoryImpl(
+                    apiClient: context.read(),
+                    localService: context.read(),
+                  ),
+                ),
+              ],
+              child: child,
+            ),
         routes: [
           GoRoute(
             path: Routes.planix,

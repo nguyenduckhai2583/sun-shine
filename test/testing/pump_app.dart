@@ -15,7 +15,19 @@ Future<AuthRepository> pumpApp(
 
   await tester.pumpWidget(
     MultiProvider(
-      providers: authProviders,
+      providers: [
+        Provider(create: (context) => AuthApiClient()),
+        Provider(
+          create: (context) => AuthLocalService(),
+          dispose: (context, service) => service.dispose(),
+        ),
+        Provider<AuthRepository>(
+          create: (context) => AuthRepositoryImpl(
+            apiClient: context.read(),
+            localService: context.read(),
+          ),
+        ),
+      ],
       child: Builder(
         builder: (context) {
           authRepository = context.read<AuthRepository>();

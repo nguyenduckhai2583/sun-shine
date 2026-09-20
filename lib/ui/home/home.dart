@@ -1,4 +1,3 @@
-export 'home_providers.dart';
 export 'view_models/home_tab.dart';
 export 'view_models/home_viewmodel.dart';
 export 'widgets/home_drawer.dart';

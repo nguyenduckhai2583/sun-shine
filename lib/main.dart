@@ -8,7 +8,19 @@ void main() {
   DiLog.enabled = BuildConfig().isDebug;
   runApp(
     MultiProvider(
-      providers: authProviders,
+      providers: [
+        Provider(create: (context) => AuthApiClient()),
+        Provider(
+          create: (context) => AuthLocalService(),
+          dispose: (context, service) => service.dispose(),
+        ),
+        Provider<AuthRepository>(
+          create: (context) => AuthRepositoryImpl(
+            apiClient: context.read(),
+            localService: context.read(),
+          ),
+        ),
+      ],
       child: const AuthScope(child: MainApp()),
     ),
   );

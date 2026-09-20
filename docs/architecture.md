@@ -104,14 +104,14 @@ into a sibling page. Nesting `routes:` buys a nested URL and the right stack
 order — never a shared ancestor.
 
 That leaves exactly two places a module's data layer can live: above the root
-navigator (`appProviders`), or inside a shell. `ShellRoute` is the only
+navigator (the session scope), or inside a shell. `ShellRoute` is the only
 go_router construct that makes one widget a real ancestor of several routes,
 because its builder receives the nested `Navigator` as `child`:
 
 ```dart
 ShellRoute(
   builder: (context, state, child) =>
-      MultiProvider(providers: planixModuleProviders, child: child),
+      MultiProvider(providers: [...], child: child),
   routes: [
     GoRoute(
       path: Routes.planix,
@@ -124,8 +124,8 @@ ShellRoute(
 The scope is disposed by the framework when the module is popped — no
 per-module cleanup line to remember.
 
-This replaces an earlier flat-route shape that kept `planixModuleProviders` in
-`appProviders` and cleared it by hand:
+This replaces an earlier flat-route shape that kept the planix module
+providers in the session scope and cleared them by hand:
 
 ```dart
 onExit: (context, state) {
@@ -165,10 +165,10 @@ never resolved before the repo was archived.
 Two scopes, nested:
 
 ```
-authProviders        AuthApiClient, AuthLocalService, AuthRepository
-└── AuthScope        StreamBuilder on the session; key: ValueKey(userId)
-    └── appProviders ChannelApiClient, ChannelLocalService, ChannelRepository
-        └── MainApp  MaterialApp.router
+main.dart        AuthApiClient, AuthLocalService, AuthRepository
+└── AuthScope    StreamBuilder on the session; key: ValueKey(userId)
+    └─ session   ChannelApiClient, ChannelLocalService, ChannelRepository
+       └── MainApp  MaterialApp.router
 ```
 
 Signing out drops the session, the key flips to `_anonymous`, the subtree
@@ -176,8 +176,8 @@ unmounts, and every `Provider.dispose` runs — `ChannelLocalService.dispose()`
 closes its `BehaviorSubject`. Switching accounts flips the key to the new user
 id, so the whole session scope is rebuilt from scratch.
 
-Nothing has to be remembered. Adding a feature cache to `channelDataProviders`
-gets clear-on-sign-out for free.
+Nothing has to be remembered. Adding a feature cache to the session scope in
+`AuthScope` gets clear-on-sign-out for free.
 
 Both apps surveyed clear manually instead, and pay for it:
 
@@ -277,8 +277,8 @@ own scope and delegates to a private view:
 
 | Scope | Mounted by | Contains |
 |---|---|---|
-| auth | `main.dart` (`authProviders`) | `AuthApiClient`, `AuthLocalService`, `AuthRepository` |
-| session | `AuthScope` (`appProviders`), keyed by user id | `ChannelApiClient`, `ChannelLocalService`, `ChannelRepository` |
+| auth | `main.dart` | `AuthApiClient`, `AuthLocalService`, `AuthRepository` |
+| session | `AuthScope`, keyed by user id | `ChannelApiClient`, `ChannelLocalService`, `ChannelRepository` |
 | home | `HomeScreen` | `WorkspaceApiClient`, `WorkspaceRepository`, `HomeViewModel` |
 | channels | `ChannelsScreen` | `ChannelsViewModel` |
 | channel detail | `ChannelDetailScreen` | `ChannelDetailViewModel` |
@@ -288,12 +288,12 @@ own scope and delegates to a private view:
 
 Data that several screens must agree on lives above them — at the session
 root when the whole app needs it, or in a module `ShellRoute` when only one
-feature does; view models stay per-screen. `appProviders` composes feature-owned lists (`channelDataProviders`)
-rather than listing every dependency itself, so it stays one line per feature.
+feature does; view models stay per-screen.
 
-A provider list is a plain function, so a scope that depends on route
-parameters just takes them as arguments — `channelProviders(channelId)` versus
-`homeProviders`.
+Each scope writes its `providers:` list inline, at the `MultiProvider` that
+mounts it. There is no `<feature>_providers.dart` indirection: a scope is read
+where it is declared, and a scope that depends on a route parameter just closes
+over it (`ChannelDetailScreen` reads `channelId` straight from its field).
 
 Scope reach follows the element tree, not the route tree. Anything rendered
 inside the home shell — the tab screens, the drawer, and nested routes such as

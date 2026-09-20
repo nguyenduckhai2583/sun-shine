@@ -17,7 +17,19 @@ class AuthScope extends StatelessWidget {
         final userId = snapshot.data?.userId ?? '_anonymous';
         return MultiProvider(
           key: ValueKey(userId),
-          providers: appProviders,
+          providers: [
+            Provider(create: (context) => ChannelApiClient()),
+            Provider(
+              create: (context) => ChannelLocalService(),
+              dispose: (context, service) => service.dispose(),
+            ),
+            Provider<ChannelRepository>(
+              create: (context) => ChannelRepositoryImpl(
+                apiClient: context.read(),
+                localService: context.read(),
+              ),
+            ),
+          ],
           child: child,
         );
       },
