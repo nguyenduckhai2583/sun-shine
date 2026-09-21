@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'workspace_api_model.dart';
@@ -9,7 +9,6 @@ part of 'workspace_api_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -29,21 +28,16 @@ $WorkspaceApiModelCopyWith<WorkspaceApiModel> get copyWith => _$WorkspaceApiMode
 
 @override
 bool operator ==(Object other) {
-  final _this = this as WorkspaceApiModel;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceApiModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.badgeCount, _this.badgeCount) || other.badgeCount == _this.badgeCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.badgeCount, badgeCount) || other.badgeCount == badgeCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode {
-  final _this = this as WorkspaceApiModel;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.badgeCount);
-}
+int get hashCode => Object.hash(runtimeType,id,name,badgeCount);
 
 @override
 String toString() {
-  final _this = this as WorkspaceApiModel;
-  return 'WorkspaceApiModel(id: ${_this.id}, name: ${_this.name}, badgeCount: ${_this.badgeCount})';
+  return 'WorkspaceApiModel(id: $id, name: $name, badgeCount: $badgeCount)';
 }
 
 
@@ -72,7 +66,7 @@ class _$WorkspaceApiModelCopyWithImpl<$Res>
 /// Create a copy of WorkspaceApiModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? badgeCount = null,}) {
-  return _then(WorkspaceApiModel(
+  return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,badgeCount: null == badgeCount ? _self.badgeCount : badgeCount // ignore: cast_nullable_to_non_nullable
@@ -237,18 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.badgeCount, badgeCount) || other.badgeCount == badgeCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.badgeCount, badgeCount) || other.badgeCount == badgeCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode {
-    return Object.hash(runtimeType,id,name,badgeCount);
-}
+int get hashCode => Object.hash(runtimeType,id,name,badgeCount);
 
 @override
 String toString() {
-    return 'WorkspaceApiModel(id: $id, name: $name, badgeCount: $badgeCount)';
+  return 'WorkspaceApiModel(id: $id, name: $name, badgeCount: $badgeCount)';
 }
 
 

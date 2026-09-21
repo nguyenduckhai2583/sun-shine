@@ -1,11 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   BuildConfig().setupEnvironment();
   Di.observer = const DiLog();
   DiLog.enabled = BuildConfig().isDebug;
+
+  await AppDatabase.instance.open();
+
   runApp(
     MultiProvider(
       providers: [
@@ -20,6 +23,10 @@ void main() {
         Provider<SessionRepository>(
           create: (context) =>
               SessionRepositoryImpl(localService: context.read()),
+        ),
+        Provider(
+          create: (context) => SessionManager(sessionRepository: context.read()),
+          dispose: (context, manager) => manager.dispose(),
         ),
         Provider<AuthRepository>(
           create: (context) => AuthRepositoryImpl(
@@ -51,7 +58,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     _router = createRouter(
-      sessionRepository: context.read<SessionRepository>(),
+      sessionManager: context.read<SessionManager>(),
       debugLogDiagnostics: BuildConfig().isDebug,
     );
   }

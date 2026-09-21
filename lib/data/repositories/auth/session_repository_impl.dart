@@ -20,15 +20,18 @@ class SessionRepositoryImpl extends BaseRepo implements SessionRepository {
   bool get isSignedIn => currentSession != null;
 
   @override
+  Future<void> restore() => _localService.restore();
+
+  @override
   Future<void> adoptSession(Session session) async {
-    _localService.save(session);
+    await _localService.save(session);
   }
 
   @override
   Future<void> assignWorkspace(String workspaceId) async {
     final session = currentSession;
     if (session == null) return;
-    _localService.save(session.copyWith(workspaceId: workspaceId));
+    await _localService.save(session.copyWith(workspaceId: workspaceId));
   }
 
   @override
@@ -39,7 +42,7 @@ class SessionRepositoryImpl extends BaseRepo implements SessionRepository {
   }) async {
     final session = currentSession;
     if (session == null) return;
-    _localService.save(
+    await _localService.save(
       session.copyWith(
         token: token,
         refreshToken: refreshToken ?? session.refreshToken,
@@ -50,6 +53,6 @@ class SessionRepositoryImpl extends BaseRepo implements SessionRepository {
 
   @override
   Future<void> signOut() async {
-    _localService.clear();
+    await _localService.clear();
   }
 }

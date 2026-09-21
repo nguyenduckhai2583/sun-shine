@@ -12,7 +12,13 @@ Future<SessionRepository> pumpApp(
 }) async {
   BuildConfig().setupEnvironment();
 
-  late SessionRepository sessionRepository;
+  final authLocalService = AuthLocalService();
+  final sessionRepository = SessionRepositoryImpl(
+    localService: authLocalService,
+  );
+  final sessionManager = SessionManager(sessionRepository: sessionRepository);
+  addTearDown(authLocalService.dispose);
+  addTearDown(sessionManager.dispose);
 
   await tester.pumpWidget(
     MultiProvider(
@@ -26,25 +32,15 @@ Future<SessionRepository> pumpApp(
         Provider<AuthRepository>(
           create: (context) => AuthRepositoryImpl(client: FakeAuthApiClient()),
         ),
-        Provider(
-          create: (context) => AuthLocalService(),
-          dispose: (context, service) => service.dispose(),
-        ),
-        Provider<SessionRepository>(
-          create: (context) =>
-              SessionRepositoryImpl(localService: context.read()),
-        ),
+        Provider(create: (context) => authLocalService),
+        Provider<SessionRepository>(create: (context) => sessionRepository),
+        Provider(create: (context) => sessionManager),
       ],
-      child: Builder(
-        builder: (context) {
-          sessionRepository = context.read<SessionRepository>();
-          return AuthScope(
-            child: _TestApp(
-              sessionRepository: sessionRepository,
-              initialLocation: initialLocation ?? Routes.home,
-            ),
-          );
-        },
+      child: AuthScope(
+        child: _TestApp(
+          sessionManager: sessionManager,
+          initialLocation: initialLocation ?? Routes.home,
+        ),
       ),
     ),
   );
@@ -72,12 +68,9 @@ Session fakeSession({
 }
 
 class _TestApp extends StatefulWidget {
-  const _TestApp({
-    required this.sessionRepository,
-    required this.initialLocation,
-  });
+  const _TestApp({required this.sessionManager, required this.initialLocation});
 
-  final SessionRepository sessionRepository;
+  final SessionManager sessionManager;
   final String initialLocation;
 
   @override
@@ -86,7 +79,7 @@ class _TestApp extends StatefulWidget {
 
 class _TestAppState extends State<_TestApp> {
   late final GoRouter _router = createRouter(
-    sessionRepository: widget.sessionRepository,
+    sessionManager: widget.sessionManager,
     initialLocation: widget.initialLocation,
   );
 

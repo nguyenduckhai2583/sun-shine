@@ -1,6 +1,7 @@
 export 'repositories/auth/auth_manager.dart';
 export 'repositories/auth/auth_repository.dart';
 export 'repositories/auth/auth_repository_impl.dart';
+export 'repositories/auth/session_manager.dart';
 export 'repositories/auth/session_repository.dart';
 export 'repositories/auth/session_repository_impl.dart';
 export 'repositories/channel/channel_repository.dart';
@@ -27,5 +28,8 @@ export 'services/api/project_api_client.dart';
 export 'services/api/token_refresh_api_client.dart';
 export 'services/api/workspace_api_client.dart';
 export 'services/local/auth_local_service.dart';
+export 'services/local/base_isar_service.dart';
 export 'services/local/channel_local_service.dart';
+export 'services/local/database/app_database.dart';
+export 'services/local/model/session_entity.dart';
 export 'services/local/project_local_service.dart';

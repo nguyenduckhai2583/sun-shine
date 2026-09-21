@@ -9,6 +9,8 @@ abstract class SessionRepository {
 
   bool get isSignedIn;
 
+  Future<void> restore();
+
   Future<void> adoptSession(Session session);
 
   Future<void> assignWorkspace(String workspaceId);

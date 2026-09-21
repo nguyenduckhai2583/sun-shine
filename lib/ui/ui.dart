@@ -5,3 +5,4 @@ export 'dms/dms.dart';
 export 'home/home.dart';
 export 'more/more.dart';
 export 'planix/planix.dart';
+export 'splash/splash.dart';

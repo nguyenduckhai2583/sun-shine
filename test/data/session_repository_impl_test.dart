@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sun_shine/core.dart';
+
+import '../testing/fakes/fake_auth_local_service.dart';
 
 void main() {
   group('SessionRepositoryImpl', () {
@@ -82,6 +86,46 @@ void main() {
 
       expect(repository.isSignedIn, isFalse);
       expect(repository.currentSession, isNull);
+    });
+  });
+
+  group('SessionRepositoryImpl storage', () {
+    const khai = Session(
+      userId: 'u1',
+      token: 't1',
+      user: User(id: 'u1', email: 'khai@sunshine.com'),
+    );
+
+    test('adopting reports done only once the session is stored', () async {
+      final gate = Completer<void>();
+      final service = GatedAuthLocalService(gate: gate.future);
+      addTearDown(service.dispose);
+      final repository = SessionRepositoryImpl(localService: service);
+
+      var done = false;
+      unawaited(repository.adoptSession(khai).then((_) => done = true));
+      await pumpEventQueue();
+      expect(done, isFalse, reason: 'still waiting on storage');
+
+      gate.complete();
+      await pumpEventQueue();
+      expect(done, isTrue);
+    });
+
+    test('signing out reports done only once storage is emptied', () async {
+      final gate = Completer<void>();
+      final service = GatedAuthLocalService(gate: gate.future);
+      addTearDown(service.dispose);
+      final repository = SessionRepositoryImpl(localService: service);
+
+      var done = false;
+      unawaited(repository.signOut().then((_) => done = true));
+      await pumpEventQueue();
+      expect(done, isFalse, reason: 'still waiting on storage');
+
+      gate.complete();
+      await pumpEventQueue();
+      expect(done, isTrue);
     });
   });
 }

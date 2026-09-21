@@ -62,3 +62,8 @@ android/app/*.jks
 
 # Widget Preview related
 .widget_preview/
+
+# Downloaded by Isar.initializeIsarCore() when tests open a database.
+libisar.dylib
+libisar.so
+isar.dll

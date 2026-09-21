@@ -8,11 +8,11 @@ class AuthScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sessionRepository = context.read<SessionRepository>();
+    final sessionManager = context.read<SessionManager>();
 
     return StreamBuilder<Session?>(
-      stream: sessionRepository.activeSession,
-      initialData: sessionRepository.currentSession,
+      stream: sessionManager.activeSession,
+      initialData: sessionManager.currentSession,
       builder: (context, snapshot) {
         final userId = snapshot.data?.userId ?? '_anonymous';
         return MultiProvider(

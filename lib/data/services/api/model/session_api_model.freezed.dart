@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'session_api_model.dart';
@@ -9,7 +9,6 @@ part of 'session_api_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -29,21 +28,16 @@ $SessionApiModelCopyWith<SessionApiModel> get copyWith => _$SessionApiModelCopyW
 
 @override
 bool operator ==(Object other) {
-  final _this = this as SessionApiModel;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionApiModel&&(identical(other.token, _this.token) || other.token == _this.token)&&(identical(other.refreshToken, _this.refreshToken) || other.refreshToken == _this.refreshToken)&&(identical(other.expireAt, _this.expireAt) || other.expireAt == _this.expireAt)&&(identical(other.isTmpToken, _this.isTmpToken) || other.isTmpToken == _this.isTmpToken)&&(identical(other.user, _this.user) || other.user == _this.user));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionApiModel&&(identical(other.token, token) || other.token == token)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.expireAt, expireAt) || other.expireAt == expireAt)&&(identical(other.isTmpToken, isTmpToken) || other.isTmpToken == isTmpToken)&&(identical(other.user, user) || other.user == user));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode {
-  final _this = this as SessionApiModel;
-  return Object.hash(runtimeType,_this.token,_this.refreshToken,_this.expireAt,_this.isTmpToken,_this.user);
-}
+int get hashCode => Object.hash(runtimeType,token,refreshToken,expireAt,isTmpToken,user);
 
 @override
 String toString() {
-  final _this = this as SessionApiModel;
-  return 'SessionApiModel(token: ${_this.token}, refreshToken: ${_this.refreshToken}, expireAt: ${_this.expireAt}, isTmpToken: ${_this.isTmpToken}, user: ${_this.user})';
+  return 'SessionApiModel(token: $token, refreshToken: $refreshToken, expireAt: $expireAt, isTmpToken: $isTmpToken, user: $user)';
 }
 
 
@@ -72,7 +66,7 @@ class _$SessionApiModelCopyWithImpl<$Res>
 /// Create a copy of SessionApiModel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? token = null,Object? refreshToken = freezed,Object? expireAt = freezed,Object? isTmpToken = freezed,Object? user = freezed,}) {
-  return _then(SessionApiModel(
+  return _then(_self.copyWith(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String?,expireAt: freezed == expireAt ? _self.expireAt : expireAt // ignore: cast_nullable_to_non_nullable
@@ -253,18 +247,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionApiModel&&(identical(other.token, token) || other.token == token)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.expireAt, expireAt) || other.expireAt == expireAt)&&(identical(other.isTmpToken, isTmpToken) || other.isTmpToken == isTmpToken)&&(identical(other.user, user) || other.user == user));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionApiModel&&(identical(other.token, token) || other.token == token)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.expireAt, expireAt) || other.expireAt == expireAt)&&(identical(other.isTmpToken, isTmpToken) || other.isTmpToken == isTmpToken)&&(identical(other.user, user) || other.user == user));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode {
-    return Object.hash(runtimeType,token,refreshToken,expireAt,isTmpToken,user);
-}
+int get hashCode => Object.hash(runtimeType,token,refreshToken,expireAt,isTmpToken,user);
 
 @override
 String toString() {
-    return 'SessionApiModel(token: $token, refreshToken: $refreshToken, expireAt: $expireAt, isTmpToken: $isTmpToken, user: $user)';
+  return 'SessionApiModel(token: $token, refreshToken: $refreshToken, expireAt: $expireAt, isTmpToken: $isTmpToken, user: $user)';
 }
 
 

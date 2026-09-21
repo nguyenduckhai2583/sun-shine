@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'workspace.dart';
@@ -9,7 +9,6 @@ part of 'workspace.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -26,21 +25,16 @@ $WorkspaceCopyWith<Workspace> get copyWith => _$WorkspaceCopyWithImpl<Workspace>
 
 @override
 bool operator ==(Object other) {
-  final _this = this as Workspace;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Workspace&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.unreadCount, _this.unreadCount) || other.unreadCount == _this.unreadCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Workspace&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount));
 }
 
 
 @override
-int get hashCode {
-  final _this = this as Workspace;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.unreadCount);
-}
+int get hashCode => Object.hash(runtimeType,id,name,unreadCount);
 
 @override
 String toString() {
-  final _this = this as Workspace;
-  return 'Workspace(id: ${_this.id}, name: ${_this.name}, unreadCount: ${_this.unreadCount})';
+  return 'Workspace(id: $id, name: $name, unreadCount: $unreadCount)';
 }
 
 
@@ -69,7 +63,7 @@ class _$WorkspaceCopyWithImpl<$Res>
 /// Create a copy of Workspace
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? unreadCount = null,}) {
-  return _then(Workspace(
+  return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
@@ -231,18 +225,16 @@ _$WorkspaceCopyWith<_Workspace> get copyWith => __$WorkspaceCopyWithImpl<_Worksp
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Workspace&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Workspace&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount));
 }
 
 
 @override
-int get hashCode {
-    return Object.hash(runtimeType,id,name,unreadCount);
-}
+int get hashCode => Object.hash(runtimeType,id,name,unreadCount);
 
 @override
 String toString() {
-    return 'Workspace(id: $id, name: $name, unreadCount: $unreadCount)';
+  return 'Workspace(id: $id, name: $name, unreadCount: $unreadCount)';
 }
 
 

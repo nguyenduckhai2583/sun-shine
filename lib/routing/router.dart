@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:sun_shine/core.dart';
 
 Page<void> _page(GoRouterState state, Widget child) {
@@ -12,8 +13,8 @@ final _dmsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'dms');
 final _moreNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'more');
 
 GoRouter createRouter({
-  required SessionRepository sessionRepository,
-  String initialLocation = Routes.home,
+  required SessionManager sessionManager,
+  String initialLocation = Routes.splash,
   bool debugLogDiagnostics = false,
 }) {
   return GoRouter(
@@ -21,12 +22,19 @@ GoRouter createRouter({
     initialLocation: initialLocation,
     debugLogDiagnostics: debugLogDiagnostics,
     errorBuilder: (context, state) => ErrorScreen(error: state.error),
-    refreshListenable: GoRouterRefreshStream(sessionRepository.activeSession),
+    refreshListenable: GoRouterRefreshStream(
+      Rx.merge<dynamic>([sessionManager.activeSession, sessionManager.restored]),
+    ),
     redirect: (context, state) => sessionRedirect(
-      session: sessionRepository.currentSession,
+      session: sessionManager.currentSession,
+      isRestored: sessionManager.isRestored,
       location: state.matchedLocation,
     ),
     routes: [
+      GoRoute(
+        path: Routes.splash,
+        pageBuilder: (context, state) => _page(state, const SplashScreen()),
+      ),
       GoRoute(
         path: Routes.signIn,
         pageBuilder: (context, state) => _page(state, const SignInScreen()),
@@ -137,4 +145,26 @@ GoRouter createRouter({
       ),
     ],
   );
+}
+
+String? sessionRedirect({
+  required Session? session,
+  required bool isRestored,
+  required String location,
+}) {
+  if (!isRestored) {
+    return location == Routes.splash ? null : Routes.splash;
+  }
+  if (session == null) {
+    return location == Routes.signIn ? null : Routes.signIn;
+  }
+  if (session.needsWorkspace) {
+    return location == Routes.workspace ? null : Routes.workspace;
+  }
+  if (location == Routes.signIn ||
+      location == Routes.workspace ||
+      location == Routes.splash) {
+    return Routes.home;
+  }
+  return null;
 }

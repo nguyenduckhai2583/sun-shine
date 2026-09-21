@@ -12,67 +12,173 @@ void main() {
       user: user,
     );
 
+    group('before the stored session has been looked for', () {
+      test('is held on the splash screen from anywhere', () {
+        expect(
+          sessionRedirect(
+            session: null,
+            isRestored: false,
+            location: Routes.channels,
+          ),
+          Routes.splash,
+        );
+        expect(
+          sessionRedirect(
+            session: null,
+            isRestored: false,
+            location: Routes.signIn,
+          ),
+          Routes.splash,
+        );
+      });
+
+      test('is left alone once on the splash screen', () {
+        expect(
+          sessionRedirect(
+            session: null,
+            isRestored: false,
+            location: Routes.splash,
+          ),
+          isNull,
+        );
+      });
+    });
+
     group('signed out', () {
       test('is sent to sign-in from anywhere else', () {
         expect(
-          sessionRedirect(session: null, location: Routes.channels),
+          sessionRedirect(
+            session: null,
+            isRestored: true,
+            location: Routes.channels,
+          ),
           Routes.signIn,
         );
         expect(
-          sessionRedirect(session: null, location: Routes.workspace),
+          sessionRedirect(
+            session: null,
+            isRestored: true,
+            location: Routes.workspace,
+          ),
+          Routes.signIn,
+        );
+      });
+
+      test('leaves the splash screen for sign-in', () {
+        expect(
+          sessionRedirect(
+            session: null,
+            isRestored: true,
+            location: Routes.splash,
+          ),
           Routes.signIn,
         );
       });
 
       test('is left alone once on sign-in', () {
-        expect(sessionRedirect(session: null, location: Routes.signIn), isNull);
+        expect(
+          sessionRedirect(
+            session: null,
+            isRestored: true,
+            location: Routes.signIn,
+          ),
+          isNull,
+        );
       });
     });
 
     group('signed in without a workspace', () {
       test('is sent to the workspace picker', () {
         expect(
-          sessionRedirect(session: noWorkspace, location: Routes.signIn),
+          sessionRedirect(
+            session: noWorkspace,
+            isRestored: true,
+            location: Routes.signIn,
+          ),
           Routes.workspace,
         );
         expect(
-          sessionRedirect(session: noWorkspace, location: Routes.channels),
+          sessionRedirect(
+            session: noWorkspace,
+            isRestored: true,
+            location: Routes.channels,
+          ),
+          Routes.workspace,
+        );
+      });
+
+      test('leaves the splash screen for the picker', () {
+        expect(
+          sessionRedirect(
+            session: noWorkspace,
+            isRestored: true,
+            location: Routes.splash,
+          ),
           Routes.workspace,
         );
       });
 
       test('is left alone once on the picker', () {
         expect(
-          sessionRedirect(session: noWorkspace, location: Routes.workspace),
+          sessionRedirect(
+            session: noWorkspace,
+            isRestored: true,
+            location: Routes.workspace,
+          ),
           isNull,
         );
       });
     });
 
     group('fully signed in', () {
-      test('is pulled off sign-in and the picker', () {
+      test('is pulled off sign-in, the picker and the splash screen', () {
         expect(
-          sessionRedirect(session: ready, location: Routes.signIn),
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            location: Routes.signIn,
+          ),
           Routes.home,
         );
         expect(
-          sessionRedirect(session: ready, location: Routes.workspace),
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            location: Routes.workspace,
+          ),
+          Routes.home,
+        );
+        expect(
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            location: Routes.splash,
+          ),
           Routes.home,
         );
       });
 
       test('is left alone anywhere in the app', () {
         expect(
-          sessionRedirect(session: ready, location: Routes.channels),
-          isNull,
-        );
-        expect(
-          sessionRedirect(session: ready, location: Routes.planix),
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            location: Routes.channels,
+          ),
           isNull,
         );
         expect(
           sessionRedirect(
             session: ready,
+            isRestored: true,
+            location: Routes.planix,
+          ),
+          isNull,
+        );
+        expect(
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
             location: Routes.channelDetail('general'),
           ),
           isNull,
@@ -82,12 +188,17 @@ void main() {
 
     test('assigning a workspace changes the destination', () {
       expect(
-        sessionRedirect(session: noWorkspace, location: Routes.workspace),
+        sessionRedirect(
+          session: noWorkspace,
+          isRestored: true,
+          location: Routes.workspace,
+        ),
         isNull,
       );
       expect(
         sessionRedirect(
           session: noWorkspace.copyWith(workspaceId: 'w1'),
+          isRestored: true,
           location: Routes.workspace,
         ),
         Routes.home,

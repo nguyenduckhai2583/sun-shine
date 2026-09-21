@@ -6,6 +6,10 @@ class FakeSessionRepository implements SessionRepository {
 
   void emit(Session? session) => _subject.add(session);
 
+  Session? stored;
+  Object? restoreError;
+  int restoreCount = 0;
+
   void dispose() => _subject.close();
 
   @override
@@ -38,6 +42,13 @@ class FakeSessionRepository implements SessionRepository {
   }) async {
     final session = currentSession;
     if (session != null) emit(session.copyWith(token: token));
+  }
+
+  @override
+  Future<void> restore() async {
+    restoreCount++;
+    if (restoreError case final error?) throw error;
+    emit(stored);
   }
 
   @override
