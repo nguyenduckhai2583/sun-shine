@@ -12,7 +12,7 @@ Future<void> settle() =>
     Future<void>.delayed(const Duration(milliseconds: 400));
 
 void main() {
-  group('StudentsViewModel — derived getter', () {
+  group('StudentsViewModel — derived getter, no debounce', () {
     late StudentsViewModel viewModel;
 
     setUp(() {
@@ -29,7 +29,7 @@ void main() {
       });
     });
 
-    test('typing fast notifies once, with the last query', () async {
+    test('every keystroke lands: no debounce on this one', () async {
       await settle();
       final queries = <String>[];
       viewModel.addListener(() => queries.add(viewModel.query));
@@ -38,9 +38,8 @@ void main() {
         ..search('a')
         ..search('an')
         ..search('ann');
-      await settle();
 
-      expect(queries, ['ann']);
+      expect(queries, ['a', 'an', 'ann']);
     });
 
     test('filters by name or class', () async {
@@ -48,20 +47,17 @@ void main() {
       expect(viewModel.visibleStudents, hasLength(5));
 
       viewModel.search('chi');
-      await settle();
       expect(viewModel.visibleStudents.single.name, 'Chi Pham');
 
       viewModel.search('10A1');
-      await settle();
       expect(viewModel.visibleStudents, hasLength(2));
 
       viewModel.search('');
-      await settle();
       expect(viewModel.visibleStudents, hasLength(5));
     });
   });
 
-  group('TeachersViewModel — stored field', () {
+  group('TeachersViewModel — stored field, debounced', () {
     late TeachersViewModel viewModel;
 
     setUp(() {
