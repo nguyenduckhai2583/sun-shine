@@ -27,7 +27,7 @@ class _StudentsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final students = context.watch<StudentsViewModel>().students;
+    final students = context.watch<StudentsViewModel>().visibleStudents;
     // AuthScope puts the session's User in the scope as a plain value, so
     // the app bar does not need to watch the repository at all.
     final name = context.watch<User?>()?.name ?? '';
@@ -45,19 +45,40 @@ class _StudentsView extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView.separated(
-        itemCount: students.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final student = students[index];
-          return ListTile(
-            leading: CircleAvatar(child: Text(student.name.characters.first)),
-            title: Text(student.name),
-            subtitle: Text('Class ${student.className}'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(Routes.studentDetail(student.id)),
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: TextField(
+              // Fires on every keystroke; the view model debounces.
+              onChanged: context.read<StudentsViewModel>().search,
+              decoration: const InputDecoration(
+                hintText: 'Search name or class',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              itemCount: students.length,
+              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final student = students[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    child: Text(student.name.characters.first),
+                  ),
+                  title: Text(student.name),
+                  subtitle: Text('Class ${student.className}'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push(Routes.studentDetail(student.id)),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       // Opens the teacher module. TeacherRepository does not exist yet at
       // this point — pushing this route is what creates it.

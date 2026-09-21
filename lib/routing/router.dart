@@ -55,9 +55,7 @@ GoRouter createRouter({
           path: Routes.studentDetailRelative,
           pageBuilder: (context, state) => _page(
             state,
-            StudentDetailScreen(
-              studentId: state.pathParameters['studentId']!,
-            ),
+            StudentDetailScreen(studentId: state.pathParameters['studentId']!),
           ),
         ),
       ],

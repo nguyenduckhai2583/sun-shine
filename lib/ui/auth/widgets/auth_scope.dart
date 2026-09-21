@@ -62,9 +62,7 @@ class _AuthScopeState extends State<AuthScope> {
           key: ValueKey(user?.id ?? '_anonymous'),
           providers: [
             Provider<User?>.value(value: user),
-            Provider<StudentApiClient>(
-              create: (context) => StudentApiClient(),
-            ),
+            Provider<StudentApiClient>(create: (context) => StudentApiClient()),
             // The only data-layer object that owns a resource, so it is the
             // only one that needs a dispose.
             Provider<StudentLocalService>(

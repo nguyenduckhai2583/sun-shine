@@ -25,7 +25,7 @@ class _TeachersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final teachers = context.watch<TeachersViewModel>().teachers;
+    final teachers = context.watch<TeachersViewModel>().filteredTeachers;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,19 +35,39 @@ class _TeachersView extends StatelessWidget {
         // `context.pop()` pops the first navigator that can — the root one.
         leading: BackButton(onPressed: () => context.pop()),
       ),
-      body: ListView.separated(
-        itemCount: teachers.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final teacher = teachers[index];
-          return ListTile(
-            leading: CircleAvatar(child: Text(teacher.name.characters.first)),
-            title: Text(teacher.name),
-            subtitle: Text(teacher.subject),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(Routes.teacherDetail(teacher.id)),
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: TextField(
+              onChanged: context.read<TeachersViewModel>().search,
+              decoration: const InputDecoration(
+                hintText: 'Search name or subject',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              itemCount: teachers.length,
+              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final teacher = teachers[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    child: Text(teacher.name.characters.first),
+                  ),
+                  title: Text(teacher.name),
+                  subtitle: Text(teacher.subject),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push(Routes.teacherDetail(teacher.id)),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
