@@ -2,7 +2,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
 
-/// The app mark on a frosted-glass plate, sized to the viewport.
 class GlassIcon extends StatelessWidget {
   const GlassIcon({
     super.key,

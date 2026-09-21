@@ -60,14 +60,11 @@ void main() {
       await tester.enterText(find.byType(TextField).first, 'khai@sunshine.com');
       await tester.enterText(find.byType(TextField).last, 'password');
       await tester.pump();
-      // The form scrolls; the button sits below the fold at test size.
       await tester.ensureVisible(find.byType(FilledButton));
       await tester.pumpAndSettle();
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      // The sign-in response carries no workspace, so the redirect sends the
-      // user to pick one rather than into the app.
       expect(find.byType(SignInScreen), findsNothing);
       expect(find.text('Workspace'), findsOneWidget);
     });
@@ -89,7 +86,6 @@ void main() {
       await tester.enterText(find.byType(TextField).first, 'nope@sunshine.com');
       await tester.enterText(find.byType(TextField).last, 'wrong');
       await tester.pump();
-      // The form scrolls; the button sits below the fold at test size.
       await tester.ensureVisible(find.byType(FilledButton));
       await tester.pumpAndSettle();
       await tester.tap(find.byType(FilledButton));

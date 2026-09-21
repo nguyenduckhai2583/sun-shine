@@ -4,18 +4,12 @@ import 'package:sun_shine/core.dart';
 
 import 'fakes/fake_auth_api_client.dart';
 
-/// Boots the real app tree: auth scope, session scope, router.
-///
-/// The API client is faked, so nothing here touches the network. Signs in by
-/// default, so tests that care about the authenticated app do not have to walk
-/// the sign-in form first.
 Future<SessionRepository> pumpApp(
   WidgetTester tester, {
   String? initialLocation,
   bool signedIn = true,
   FakeAuthApiClient? authApi,
 }) async {
-  // Sign-in hashes the password, which reads the salts off BuildConfig.
   BuildConfig().setupEnvironment();
 
   late SessionRepository sessionRepository;
@@ -23,15 +17,14 @@ Future<SessionRepository> pumpApp(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
-        // The sign-in screen builds use cases that need it; its own client is
-        // never called here because the repository below is faked.
         Provider(
-          create: (context) => AuthManager(baseUrl: 'https://test.invalid/'),
+          create: (context) => AuthManager(
+            baseUrl: 'https://test.invalid/',
+            apiClient: authApi ?? FakeAuthApiClient(),
+          ),
         ),
         Provider<AuthRepository>(
-          create: (context) => AuthRepositoryImpl(
-            signInClient: authApi ?? FakeAuthApiClient(),
-          ),
+          create: (context) => AuthRepositoryImpl(client: FakeAuthApiClient()),
         ),
         Provider(
           create: (context) => AuthLocalService(),
@@ -65,7 +58,6 @@ Future<SessionRepository> pumpApp(
   return sessionRepository;
 }
 
-/// A signed-in account, as the fake API would hand one back.
 Session fakeSession({
   String userId = 'u1',
   String email = 'khai@sunshine.com',
@@ -74,8 +66,6 @@ Session fakeSession({
   return Session(
     userId: userId,
     token: 'tok_$userId',
-    // A session without one redirects to the workspace picker, which is not
-    // what most tests are about.
     workspaceId: workspaceId,
     user: User(id: userId, email: email),
   );

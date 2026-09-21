@@ -4,8 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sun_shine/core.dart';
 
-/// Answers requests without a network, so the interceptor is the only thing
-/// under test.
 class _FakeAdapter implements HttpClientAdapter {
   _FakeAdapter(this._respond);
 
@@ -40,8 +38,6 @@ void main() {
     var refreshCount = 0;
     var failedCount = 0;
 
-    /// Answers 200 once the request carries the refreshed token, and [status]
-    /// until then — the shape of a token that has just expired.
     void wire({
       required int status,
       required Future<String?> Function() refresh,

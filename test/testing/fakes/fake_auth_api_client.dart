@@ -1,6 +1,5 @@
 import 'package:sun_shine/core.dart';
 
-/// Stands in for the retrofit client so tests never touch the network.
 class FakeAuthApiClient implements AuthApiClient {
   FakeAuthApiClient({this.signInResult, this.profileResult});
 

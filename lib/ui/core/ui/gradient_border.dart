@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 
-/// A [BoxBorder] painted with a [Gradient] rather than a flat colour.
 class GradientBorder extends BoxBorder {
   const GradientBorder({required this.gradient, required this.width});
 
@@ -38,7 +37,10 @@ class GradientBorder extends BoxBorder {
         canvas.drawCircle(rect.center, radius, paint);
       case BoxShape.rectangle:
         if (borderRadius != null) {
-          canvas.drawRRect(borderRadius.toRRect(rect).deflate(width / 2), paint);
+          canvas.drawRRect(
+            borderRadius.toRRect(rect).deflate(width / 2),
+            paint,
+          );
           return;
         }
         canvas.drawRect(rect.deflate(width / 2), paint);

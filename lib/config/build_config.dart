@@ -14,16 +14,11 @@ class BuildConfig {
   late final String appVersionCode;
   late final Env env;
 
-  /// Salts for the client-side password digests. They arrive through
-  /// `--dart-define-from-file`, so they are never literals in the source.
   late final String passwordSalt;
   late final String unlockedSalt;
 
   bool _isSetUp = false;
 
-  /// Safe to call more than once: `main()` calls it, and so does any test
-  /// harness that boots part of the tree. The fields are `late final`, so a
-  /// second assignment would throw.
   void setupEnvironment() {
     if (_isSetUp) return;
     _isSetUp = true;

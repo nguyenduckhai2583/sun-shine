@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
 
-/// The faint tiled grid behind the auth screens.
 class GridTileBackground extends StatelessWidget {
   const GridTileBackground({super.key, required this.child});
 
@@ -16,8 +15,6 @@ class GridTileBackground extends StatelessWidget {
 class _GridTile extends StatelessWidget {
   const _GridTile();
 
-  /// Employer reads `context.isTablet` from a GetX extension; the same
-  /// threshold expressed against the layout instead.
   static const _tabletWidth = 600.0;
 
   @override

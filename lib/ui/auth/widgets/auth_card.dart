@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 
-/// The rounded panel the auth forms sit on.
 class AuthCardWidget extends StatelessWidget {
   const AuthCardWidget({super.key, required this.child});
 

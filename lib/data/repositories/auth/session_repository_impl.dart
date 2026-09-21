@@ -1,10 +1,5 @@
 import 'package:sun_shine/core.dart';
 
-/// In-memory session state.
-///
-/// The interface is what the rest of the app codes against; only this class
-/// knows the sessions live in memory. Swapping the backing store for Isar
-/// changes nothing above it.
 class SessionRepositoryImpl extends BaseRepo implements SessionRepository {
   SessionRepositoryImpl({required AuthLocalService localService})
     : _localService = localService;

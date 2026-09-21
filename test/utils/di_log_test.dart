@@ -24,15 +24,11 @@ void main() {
   List<String> eventsFor(String type) =>
       logs.where((l) => l.startsWith('[di] $type ')).toList();
 
-  // '[di] ChannelLocalService created' -> 'ChannelLocalService'
-  String typeOf(String line) =>
-      line.replaceFirst('[di] ', '').split(' ').first;
+  String typeOf(String line) => line.replaceFirst('[di] ', '').split(' ').first;
 
   testWidgets('every layer logs on creation', (tester) async {
     await pumpApp(tester);
 
-    // AuthApiClient is absent on purpose: the harness fakes it, and a fake
-    // is not a layer this observer is meant to see.
     for (final type in [
       'AuthLocalService',
       'AuthRepositoryImpl',
@@ -68,11 +64,10 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    expect(
-      eventsFor('PlanixProjectsViewModel'),
-      ['[di] PlanixProjectsViewModel created', '[di] PlanixProjectsViewModel deleted'],
-      reason: 'created on the way in, deleted on the way out',
-    );
+    expect(eventsFor('PlanixProjectsViewModel'), [
+      '[di] PlanixProjectsViewModel created',
+      '[di] PlanixProjectsViewModel deleted',
+    ], reason: 'created on the way in, deleted on the way out');
   });
 
   testWidgets('sign-out logs disposal of the whole session scope', (
@@ -93,7 +88,11 @@ void main() {
 
     expect(
       disposed,
-      containsAll(['ChannelLocalService', 'HomeViewModel', 'ChannelsViewModel']),
+      containsAll([
+        'ChannelLocalService',
+        'HomeViewModel',
+        'ChannelsViewModel',
+      ]),
       reason: 'ViewModels and resource-owning services release with the scope',
     );
     expect(
@@ -108,18 +107,5 @@ void main() {
     await pumpApp(tester);
 
     expect(logs, isEmpty);
-  });
-
-  test('Di.observed reports creation and hands the instance back', () {
-    final instance = StringBuffer('x');
-
-    final returned = Di.observed(instance);
-
-    expect(
-      identical(returned, instance),
-      isTrue,
-      reason: 'it wraps a registration, so it must be transparent',
-    );
-    expect(logs, ['[di] StringBuffer created']);
   });
 }

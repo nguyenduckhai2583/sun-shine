@@ -13,7 +13,7 @@ class SignInScreen extends StatelessWidget {
         Provider(
           create: (context) => SignInUseCase(
             authManager: context.read(),
-            authRepository: context.read(),
+            authRepository: context.read<AuthManager>().authRepository,
           ),
         ),
         Provider(
@@ -46,8 +46,6 @@ class _SignInView extends StatefulWidget {
 }
 
 class _SignInViewState extends State<_SignInView> {
-  // These belong to the view, not the view model: they are how this screen
-  // holds text, and they die with it.
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _passwordFocus = FocusNode();
@@ -78,8 +76,6 @@ class _SignInViewState extends State<_SignInView> {
       email: _email.text,
       password: _password.text,
     ));
-    // A `true` result means the server wants a second factor. Routing there
-    // waits on the auth-code screen; until then the redirect handles the rest.
   }
 
   @override
@@ -193,7 +189,6 @@ class _SignInViewState extends State<_SignInView> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      // TODO(task-12): wire SignInPasskeyUseCase.
                       onPressed: null,
                       icon: const Icon(Icons.key),
                       label: Text(l10n.continueWithPasskey),
@@ -203,7 +198,6 @@ class _SignInViewState extends State<_SignInView> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      // TODO(task-14): open the QR scanner.
                       onPressed: null,
                       icon: const Icon(Icons.qr_code_scanner),
                       label: Text(l10n.scanQrCodeAction),
@@ -213,8 +207,8 @@ class _SignInViewState extends State<_SignInView> {
                     const SizedBox(height: 12),
                     Text(
                       switch (viewModel.signIn.result) {
-                        Error(error: final ApiException e) => e
-                            .localizedMessage(l10n),
+                        Error(error: final ApiException e) =>
+                          e.localizedMessage(l10n),
                         _ => l10n.incorrectEmailOrPassword,
                       },
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -281,7 +275,6 @@ class _LegalLinks extends StatelessWidget {
   }
 }
 
-/// Email addresses are case-insensitive; the server stores them lowercased.
 class _LowerCaseFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(

@@ -81,8 +81,6 @@ void main() {
     });
 
     test('assigning a workspace changes the destination', () {
-      // The case AuthScope's ValueKey rebuild cannot cover: same account,
-      // different session state, so nothing would remount.
       expect(
         sessionRedirect(session: noWorkspace, location: Routes.workspace),
         isNull,

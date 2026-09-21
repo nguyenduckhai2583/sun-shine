@@ -1,8 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:sun_shine/core.dart';
 
-/// Drives session state directly, so tests can move the app between signed-out,
-/// signed-in-without-a-workspace and fully-signed-in without an API.
 class FakeSessionRepository implements SessionRepository {
   final _subject = BehaviorSubject<Session?>.seeded(null);
 

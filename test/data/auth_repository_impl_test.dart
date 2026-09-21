@@ -15,7 +15,7 @@ void main() {
 
     setUp(() {
       apiClient = FakeAuthApiClient();
-      repository = AuthRepositoryImpl(signInClient: apiClient);
+      repository = AuthRepositoryImpl(client: apiClient);
     });
 
     test('maps the API session onto the domain model', () async {

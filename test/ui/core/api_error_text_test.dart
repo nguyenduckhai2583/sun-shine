@@ -9,7 +9,8 @@ void main() {
     test('translates every transport failure', () {
       const cases = {
         ApiErrorEnum.noInternet: 'No internet connection',
-        ApiErrorEnum.timeout: 'Request timed out. Please check your connection.',
+        ApiErrorEnum.timeout:
+            'Request timed out. Please check your connection.',
         ApiErrorEnum.cancelled: 'The request was cancelled',
         ApiErrorEnum.badCertificate: 'Incorrect certificate as configured',
         ApiErrorEnum.badFormat: 'Bad response format',
@@ -45,8 +46,6 @@ void main() {
     });
 
     test('covers every value of the enum', () {
-      // The extension switches exhaustively, so this guards the test itself:
-      // a new kind must be added above, not silently skipped.
       for (final kind in ApiErrorEnum.values) {
         expect(
           ApiException(error: kind).localizedMessage(l10n),

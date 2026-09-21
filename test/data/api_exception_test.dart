@@ -71,9 +71,6 @@ void main() {
     });
 
     test('carries no user-facing English of its own', () {
-      // The data layer must not choose wording — only an ApiErrorEnum and, when
-      // the server supplied one, its verbatim text. A regression here would
-      // reintroduce strings that ignore the user's locale.
       final mapped = ApiException.from(
         DioException(
           requestOptions: RequestOptions(path: '/x'),

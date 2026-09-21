@@ -30,12 +30,14 @@ void main() {
       expect(repository.currentSession?.userId, 'u1');
     });
 
-    test('currentSession is readable synchronously, for the redirect', () async {
-      await repository.adoptSession(khai);
+    test(
+      'currentSession is readable synchronously, for the redirect',
+      () async {
+        await repository.adoptSession(khai);
 
-      // The router's redirect cannot await, so this must not be stream-only.
-      expect(repository.currentSession, isNotNull);
-    });
+        expect(repository.currentSession, isNotNull);
+      },
+    );
 
     test('activeSession emits on adopt and on sign-out', () {
       expect(

@@ -7,11 +7,6 @@ class _PendingRequest {
   final ErrorInterceptorHandler handler;
 }
 
-/// Renews an expired token and replays the request that hit the expiry.
-///
-/// The API distinguishes two failures: `440` means the token has expired and
-/// can be renewed, `401` means it cannot. Only the first is worth a refresh —
-/// retrying a `401` would loop.
 class RefreshTokenInterceptor extends Interceptor {
   RefreshTokenInterceptor({
     required this.dio,
@@ -19,12 +14,6 @@ class RefreshTokenInterceptor extends Interceptor {
     required this.onRefreshFailed,
   });
 
-  /// Marks a request that authenticates as a specific, possibly inactive,
-  /// account.
-  ///
-  /// Such a request must never be renewed or retried here: this interceptor is
-  /// bound to the *active* account, so a retry would re-run the call as them
-  /// and return their data instead.
   static const crossAccountKey = 'crossAccountRequest';
 
   static const _expiredStatus = 440;
@@ -32,7 +21,6 @@ class RefreshTokenInterceptor extends Interceptor {
 
   final Dio dio;
 
-  /// Returns the new token, or null when the session cannot be renewed.
   final Future<String?> Function() refresh;
 
   final void Function() onRefreshFailed;
@@ -43,8 +31,6 @@ class RefreshTokenInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (options.extra[crossAccountKey] == true) {
-      // The named account has no access to the active account's workspace, so
-      // sending that header would earn a 403.
       options.headers.remove('x-workspace-id');
     }
     handler.next(options);
@@ -73,8 +59,6 @@ class RefreshTokenInterceptor extends Interceptor {
       return;
     }
 
-    // A refresh is already running: wait for it rather than starting a second,
-    // which would invalidate the first one's token.
     if (_isRefreshing) {
       _pending.add(_PendingRequest(err, handler));
       return;

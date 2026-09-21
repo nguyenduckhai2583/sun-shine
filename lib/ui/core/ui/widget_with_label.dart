@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 
-/// Puts a small label above a field.
 class WidgetWithLabel extends StatelessWidget {
   const WidgetWithLabel({
     super.key,

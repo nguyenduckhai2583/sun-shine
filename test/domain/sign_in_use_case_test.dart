@@ -13,10 +13,13 @@ void main() {
 
     setUp(() {
       apiClient = FakeAuthApiClient();
-      authManager = AuthManager(baseUrl: 'https://test.invalid/');
+      authManager = AuthManager(
+        baseUrl: 'https://test.invalid/',
+        apiClient: apiClient,
+      );
       useCase = SignInUseCase(
         authManager: authManager,
-        authRepository: AuthRepositoryImpl(signInClient: apiClient),
+        authRepository: authManager.authRepository,
       );
     });
 

@@ -23,13 +23,10 @@ void main() {
         ),
         Provider<AuthRepository>(
           create: (context) => AuthRepositoryImpl(
-            signInClient: context.read<AuthManager>().authApiClient,
-            sessionClient: Di.observed(
-              AuthApiClient(
-                AppDio.create(
-                  baseUrl: BuildConfig().env.baseApiUrl,
-                  sessionRepository: context.read(),
-                ),
+            client: AuthApiClient(
+              AppDio.create(
+                baseUrl: BuildConfig().env.baseApiUrl,
+                sessionRepository: context.read(),
               ),
             ),
           ),

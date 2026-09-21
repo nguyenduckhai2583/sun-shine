@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sun_shine/core.dart';
 
+import '../testing/fakes/fake_auth_api_client.dart';
+
 void main() {
   group('AuthManager', () {
     late AuthManager manager;
@@ -56,6 +58,24 @@ void main() {
 
     test('carries the host it was given', () {
       expect(manager.dio.options.baseUrl, 'https://example.test/');
+    });
+
+    test('its repository speaks through its own client', () async {
+      final apiClient = FakeAuthApiClient();
+      final scoped = AuthManager(
+        baseUrl: 'https://example.test/',
+        apiClient: apiClient,
+      );
+
+      await scoped.authRepository.signInRemote(
+        const AuthRequest(email: 'khai@sunshine.com', sha1Password: 'digest'),
+      );
+
+      expect(apiClient.lastRequest?.email, 'khai@sunshine.com');
+    });
+
+    test('hands out the same repository every time', () {
+      expect(identical(manager.authRepository, manager.authRepository), isTrue);
     });
   });
 }

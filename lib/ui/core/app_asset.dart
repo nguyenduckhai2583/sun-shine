@@ -1,4 +1,3 @@
-/// Paths to the bundled asset files, declared under `flutter: assets:`.
 abstract final class AppAsset {
   static const String icAppIcon = 'assets/icons/ic_app_icon.svg';
 

@@ -1,10 +1,5 @@
 import 'package:sun_shine/core.dart';
 
-/// Password sign-in.
-///
-/// Returns whether the server issued a *temporary* token — true means the user
-/// still owes a second factor, so the caller routes to the auth-code or
-/// passcode step instead of finalizing.
 class SignInUseCase {
   SignInUseCase({
     required AuthManager authManager,
@@ -26,9 +21,6 @@ class SignInUseCase {
 
     return switch (result) {
       Ok(value: final session) => () {
-        // The MD5 of the salted digest is what later unlocks the E2E private
-        // key, together with the user's passcode. This is the only moment it
-        // can be derived — the password is gone once this method returns.
         _authManager.setPending(
           session.copyWith(
             md5Password: EncryptUtil.generateMd5Password(sha1Password),
