@@ -1,20 +1,22 @@
+import 'package:dio/dio.dart';
+import 'package:retrofit/retrofit.dart';
 import 'package:sun_shine/core.dart';
 
-class WorkspaceApiClient extends BaseApiClient {
-  static const _sampleWorkspaces = [
-    {'id': 'ws_1', 'name': 'Sun Shine', 'badge_count': 3},
-    {'id': 'ws_2', 'name': 'Design Team', 'badge_count': 0},
-    {'id': 'ws_3', 'name': 'Engineering', 'badge_count': 12},
-  ];
+part 'workspace_api_client.g.dart';
 
-  Future<Result<List<WorkspaceApiModel>>> getWorkspaces() async {
-    try {
-      final workspaces = _sampleWorkspaces
-          .map(WorkspaceApiModel.fromJson)
-          .toList();
-      return Result.ok(workspaces);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
+@RestApi(baseUrl: '/workspace-services', callAdapter: ResultCallAdapter)
+abstract class WorkspaceApiClient {
+  factory WorkspaceApiClient(Dio dio, {String? baseUrl}) = _WorkspaceApiClient;
+
+  @GET('/workspaces/me')
+  Future<Result<List<WorkspaceApiModel>>> getWorkspaces();
+
+  /// Reads a background account's workspaces with that account's own token.
+  /// The extra marks the call cross-account, so the refresh interceptor leaves
+  /// it alone and the active account's workspace header is dropped.
+  @GET('/workspaces/me')
+  @Extra({RefreshTokenInterceptor.crossAccountKey: true})
+  Future<Result<List<WorkspaceApiModel>>> getWorkspacesForToken(
+    @Header('Authorization') String authorization,
+  );
 }

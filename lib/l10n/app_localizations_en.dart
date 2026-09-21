@@ -47,6 +47,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String get next => 'Next';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get selectWorkspace => 'Select Workspace';
+
+  @override
+  String get selectWorkspaceDesc => 'Please select a workspace to start';
+
+  @override
+  String get noWorkspaceAvailable =>
+      'You don\'t have any workspace available. Please contact your administrator.';
+
+  @override
+  String get couldNotLoadWorkspaces => 'Could not load workspaces';
+
+  @override
   String get somethingWentWrong => 'Something went wrong';
 
   @override

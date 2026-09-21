@@ -27,7 +27,8 @@ void main() {
           user: UserApiModel(
             id: 'u1',
             email: 'khai@sunshine.com',
-            fullName: 'Khai',
+            firstName: 'Khai',
+            lastName: 'Nguyen',
           ),
         ),
       );
@@ -39,7 +40,7 @@ void main() {
       expect(session.token, 'tok');
       expect(session.refreshToken, 'refresh');
       expect(session.expireAt, 123);
-      expect(session.user?.fullName, 'Khai');
+      expect(session.user?.fullName, 'Nguyen Khai');
     });
 
     test('passes the request through untouched', () async {

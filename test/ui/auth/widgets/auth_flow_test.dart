@@ -66,7 +66,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SignInScreen), findsNothing);
-      expect(find.text('Workspace'), findsOneWidget);
+      expect(find.byType(WorkspaceScreen), findsOneWidget);
     });
 
     testWidgets('bad credentials keep the user on the form', (tester) async {
@@ -93,6 +93,71 @@ void main() {
 
       expect(find.text('Invalid credentials'), findsOneWidget);
       expect(find.byType(SignInScreen), findsOneWidget);
+    });
+  });
+
+  group('adding another account', () {
+    Future<void> openDrawer(WidgetTester tester) async {
+      await tester.tap(find.byTooltip('Open navigation menu'));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> tapAddAccount(WidgetTester tester) async {
+      await openDrawer(tester);
+      await tester.tap(find.widgetWithText(ListTile, 'Add another account'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('opens sign-in although someone is already signed in', (
+      tester,
+    ) async {
+      await pumpApp(tester);
+
+      await tapAddAccount(tester);
+
+      expect(find.byType(SignInScreen), findsOneWidget);
+      expect(find.text('Add new account'), findsOneWidget);
+    });
+
+    testWidgets('cancelling hands the first account its home back', (
+      tester,
+    ) async {
+      final auth = await pumpApp(tester);
+      await tapAddAccount(tester);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(auth.currentSession?.userId, 'u1');
+      expect(auth.allSessions, hasLength(1));
+    });
+
+    testWidgets('signing in adds the account beside the first one', (
+      tester,
+    ) async {
+      final auth = await pumpApp(
+        tester,
+        authApi: FakeAuthApiClient()
+          ..signInResult = const Result.ok(
+            SessionApiModel(
+              token: 'tok2',
+              user: UserApiModel(id: 'u2', email: 'linh@sunshine.com'),
+            ),
+          ),
+      );
+      await tapAddAccount(tester);
+
+      await tester.enterText(find.byType(TextField).first, 'linh@sunshine.com');
+      await tester.enterText(find.byType(TextField).last, 'password');
+      await tester.pump();
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(auth.allSessions.map((s) => s.userId), ['u1', 'u2']);
+      expect(auth.currentSession?.userId, 'u2');
     });
   });
 

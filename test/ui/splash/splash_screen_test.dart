@@ -33,7 +33,7 @@ void main() {
   });
 
   testWidgets('hands back whatever was stored', (tester) async {
-    repository.stored = fakeStoredSession;
+    repository.stored = [fakeStoredSession];
 
     await pumpSplash(tester);
 

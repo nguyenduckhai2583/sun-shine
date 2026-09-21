@@ -31,11 +31,14 @@ void main() {
       expect(service.currentSession, isNull);
     });
 
-    test('a saved session is readable synchronously, for the redirect', () async {
-      await service.save(khai);
+    test(
+      'a saved session is readable synchronously, for the redirect',
+      () async {
+        await service.save(khai);
 
-      expect(service.currentSession, khai);
-    });
+        expect(service.currentSession, khai);
+      },
+    );
 
     test('a saved session reaches listeners', () {
       expect(service.session.map((s) => s?.userId), emitsInOrder([null, 'u1']));
@@ -154,6 +157,103 @@ void main() {
       await service.restore();
 
       expect(service.currentSession, isNull);
+    });
+
+    test('restores every account, the flagged one active', () async {
+      await service.save(khai);
+      await service.save(linh);
+      await isar.close();
+
+      isar = await Isar.open([SessionEntitySchema], directory: directory.path);
+      final next = AuthLocalService(isar: isar);
+      addTearDown(next.dispose);
+      await next.restore();
+
+      expect(next.allSessions.map((s) => s.userId), ['u1', 'u2']);
+      expect(next.currentSession?.userId, 'u2');
+    });
+
+    test('setActive promotes an account already on the shelf', () async {
+      await service.save(khai);
+      await service.save(linh);
+
+      await service.setActive('u1');
+
+      expect(service.currentSession?.userId, 'u1');
+      final active = await isar.sessionEntitys
+          .filter()
+          .isActiveEqualTo(true)
+          .findAll();
+      expect(active.single.accountUserId, 'u1');
+    });
+
+    test('setActive ignores an account that is not signed in', () async {
+      await service.save(khai);
+
+      await service.setActive('nobody');
+
+      expect(service.currentSession?.userId, 'u1');
+    });
+
+    test('removing the active account promotes the next one', () async {
+      await service.save(khai);
+      await service.save(linh);
+
+      await service.remove('u2');
+
+      expect(service.currentSession?.userId, 'u1');
+      expect(await isar.sessionEntitys.count(), 1);
+      final active = await isar.sessionEntitys
+          .filter()
+          .isActiveEqualTo(true)
+          .findAll();
+      expect(active.single.accountUserId, 'u1');
+    });
+
+    test('removing the last account leaves nobody signed in', () async {
+      await service.save(khai);
+
+      await service.remove('u1');
+
+      expect(service.currentSession, isNull);
+      expect(await isar.sessionEntitys.count(), 0);
+    });
+
+    test('removing a background account leaves the active one', () async {
+      await service.save(linh);
+      await service.save(khai);
+
+      await service.remove('u2');
+
+      expect(service.currentSession?.userId, 'u1');
+    });
+
+    test(
+      'update renews a background account without stealing active',
+      () async {
+        await service.save(khai);
+        await service.save(linh);
+
+        await service.update(khai.copyWith(token: 't1-renewed'));
+
+        expect(service.currentSession?.userId, 'u2');
+        expect(service.sessionOf('u1')?.token, 't1-renewed');
+        final rows = await isar.sessionEntitys
+            .filter()
+            .accountUserIdEqualTo('u1')
+            .findAll();
+        expect(rows.single.token, 't1-renewed');
+        expect(rows.single.isActive, isFalse);
+      },
+    );
+
+    test('sessions exposes every account', () {
+      expect(
+        service.sessions.map((list) => list.length),
+        emitsInOrder([0, 1, 2]),
+      );
+
+      service.save(khai).then((_) => service.save(linh));
     });
   });
 }

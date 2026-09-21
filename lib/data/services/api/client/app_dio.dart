@@ -34,7 +34,7 @@ abstract final class AppDio {
           }
           return null;
         },
-        onRefreshFailed: sessionRepository.signOut,
+        onRefreshFailed: sessionRepository.signOutActive,
       ),
     ]);
     return dio;

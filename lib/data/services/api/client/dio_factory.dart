@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:sun_shine/core.dart';
 
 abstract final class DioFactory {
   static Dio create({
@@ -13,6 +14,9 @@ abstract final class DioFactory {
         receiveTimeout: const Duration(seconds: 20),
       ),
     );
+    // First in the chain, so the request line lands before anything else
+    // touches it; headers added later are read back off the response.
+    dio.interceptors.add(ApiLogInterceptor());
     dio.interceptors.addAll(interceptors);
     return dio;
   }

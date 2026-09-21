@@ -41,7 +41,7 @@ class AuthRepositoryImpl extends BaseRepo implements AuthRepository {
   User _toUser(UserApiModel model) => User(
     id: model.id,
     email: model.email,
-    fullName: model.fullName,
+    fullName: model.displayName,
     avatar: model.avatar,
   );
 }

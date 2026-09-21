@@ -1,23 +1,43 @@
 import 'package:sun_shine/core.dart';
 
 class WorkspaceRepositoryImpl extends BaseRepo implements WorkspaceRepository {
-  WorkspaceRepositoryImpl({required WorkspaceApiClient apiClient})
-    : _apiClient = apiClient;
+  WorkspaceRepositoryImpl({
+    required WorkspaceApiClient apiClient,
+    required WorkspaceLocalService localService,
+  }) : _apiClient = apiClient,
+       _localService = localService;
 
   final WorkspaceApiClient _apiClient;
-
-  List<Workspace>? _cachedWorkspaces;
+  final WorkspaceLocalService _localService;
 
   @override
-  Future<Result<List<Workspace>>> getWorkspaces() async {
-    final cached = _cachedWorkspaces;
-    if (cached != null) return Result.ok(cached);
+  Stream<Map<String, List<Workspace>>> get workspacesByAccount =>
+      _localService.workspacesByAccount;
 
-    final result = await _apiClient.getWorkspaces();
+  @override
+  Stream<List<Workspace>> watchWorkspacesOf(String accountUserId) =>
+      _localService.watchWorkspacesOf(accountUserId);
+
+  @override
+  List<Workspace> workspacesOf(String accountUserId) =>
+      _localService.workspacesOf(accountUserId);
+
+  @override
+  Future<void> restore() => _localService.restore();
+
+  @override
+  Future<Result<List<Workspace>>> refresh(
+    String accountUserId, {
+    String? token,
+  }) async {
+    final result = token == null
+        ? await _apiClient.getWorkspaces()
+        : await _apiClient.getWorkspacesForToken('Bearer $token');
+
     switch (result) {
       case Ok<List<WorkspaceApiModel>>():
         final workspaces = result.value.map(_toDomain).toList();
-        _cachedWorkspaces = workspaces;
+        await _localService.setWorkspaces(accountUserId, workspaces);
         return Result.ok(workspaces);
       case Error<List<WorkspaceApiModel>>():
         return Result.error(result.error);
@@ -25,13 +45,16 @@ class WorkspaceRepositoryImpl extends BaseRepo implements WorkspaceRepository {
   }
 
   @override
-  void invalidateCache() => _cachedWorkspaces = null;
+  Future<void> removeAccount(String accountUserId) =>
+      _localService.removeAccount(accountUserId);
 
-  Workspace _toDomain(WorkspaceApiModel model) {
-    return Workspace(
-      id: model.id,
-      name: model.name,
-      unreadCount: model.badgeCount,
-    );
-  }
+  @override
+  Future<void> pruneExcept(Set<String> accountUserIds) =>
+      _localService.pruneExcept(accountUserIds);
+
+  @override
+  Future<void> clear() => _localService.clear();
+
+  Workspace _toDomain(WorkspaceApiModel model) =>
+      Workspace(id: model.id, name: model.name);
 }

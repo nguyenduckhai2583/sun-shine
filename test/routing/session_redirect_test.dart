@@ -204,5 +204,54 @@ void main() {
         Routes.home,
       );
     });
+
+    group('while adding another account', () {
+      test('opens sign-in even though someone is signed in', () {
+        expect(
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            isAddingAccount: true,
+            location: Routes.channels,
+          ),
+          Routes.signIn,
+        );
+      });
+
+      test('is left alone once on the sign-in screen', () {
+        expect(
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            isAddingAccount: true,
+            location: Routes.signIn,
+          ),
+          isNull,
+        );
+      });
+
+      test('still waits for the stored session to be looked for', () {
+        expect(
+          sessionRedirect(
+            session: null,
+            isRestored: false,
+            isAddingAccount: true,
+            location: Routes.channels,
+          ),
+          Routes.splash,
+        );
+      });
+
+      test('cancelling hands the signed-in account back its home', () {
+        expect(
+          sessionRedirect(
+            session: ready,
+            isRestored: true,
+            location: Routes.signIn,
+          ),
+          Routes.home,
+        );
+      });
+    });
   });
 }

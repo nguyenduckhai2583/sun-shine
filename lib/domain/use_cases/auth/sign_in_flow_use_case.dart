@@ -8,6 +8,8 @@ class SignInFlowUseCase {
 
   bool get isAddingAccount => _authManager.isAddingAccount;
 
+  Stream<bool> get addingAccount => _authManager.addingAccount;
+
   void beginAddAccount() => _authManager.beginAddAccount();
 
   void cancel() => _authManager.reset();

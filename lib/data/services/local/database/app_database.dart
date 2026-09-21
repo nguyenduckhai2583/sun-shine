@@ -8,7 +8,7 @@ const _schemaVersion = 'v1';
 
 const _defaultName = 'sun_shine';
 
-const _schemas = [SessionEntitySchema];
+const _schemas = [SessionEntitySchema, WorkspaceEntitySchema];
 
 class AppDatabase {
   AppDatabase._();

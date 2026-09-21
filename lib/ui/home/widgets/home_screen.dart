@@ -8,18 +8,14 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider(create: (context) => WorkspaceApiClient()),
-        Provider<WorkspaceRepository>(
-          create: (context) =>
-              WorkspaceRepositoryImpl(apiClient: context.read()),
-        ),
-        ChangeNotifierProvider(
-          create: (context) =>
-              HomeViewModel(workspaceRepository: context.read()),
-        ),
-      ],
+    return ChangeNotifierProvider(
+      create: (context) => HomeViewModel(
+        watchAccountsUseCase: context.read(),
+        selectWorkspaceUseCase: context.read(),
+        refreshAccountWorkspacesUseCase: context.read(),
+        signOutUseCase: context.read(),
+        signInFlowUseCase: context.read(),
+      ),
       child: _HomeScaffold(navigationShell: navigationShell),
     );
   }

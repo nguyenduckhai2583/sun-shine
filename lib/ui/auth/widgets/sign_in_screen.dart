@@ -17,9 +17,6 @@ class SignInScreen extends StatelessWidget {
           ),
         ),
         Provider(
-          create: (context) => SignInFlowUseCase(authManager: context.read()),
-        ),
-        Provider(
           create: (context) => FinalizeSessionUseCase(
             authManager: context.read(),
             sessionRepository: context.read(),
@@ -103,6 +100,17 @@ class _SignInViewState extends State<_SignInView> {
                 ),
                 child: Column(
                   children: [
+                    // Adding an account replaces the route instead of pushing
+                    // one, so this is the only way back to the signed-in app.
+                    if (viewModel.isAddingAccount)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: IconButton(
+                          icon: const Icon(Icons.close),
+                          tooltip: l10n.cancel,
+                          onPressed: viewModel.cancel,
+                        ),
+                      ),
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(

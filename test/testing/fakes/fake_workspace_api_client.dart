@@ -5,7 +5,7 @@ class FakeWorkspaceApiClient implements WorkspaceApiClient {
     : workspaces = workspaces ?? defaultWorkspaces;
 
   static const defaultWorkspaces = [
-    WorkspaceApiModel(id: 'ws_1', name: 'Sun Shine', badgeCount: 3),
+    WorkspaceApiModel(id: 'ws_1', name: 'Sun Shine'),
     WorkspaceApiModel(id: 'ws_2', name: 'Design Team'),
   ];
 
@@ -13,9 +13,20 @@ class FakeWorkspaceApiClient implements WorkspaceApiClient {
   Exception? failure;
 
   int getWorkspacesCallCount = 0;
+  final List<String> authorizations = [];
 
   @override
-  Future<Result<List<WorkspaceApiModel>>> getWorkspaces() async {
+  Future<Result<List<WorkspaceApiModel>>> getWorkspaces() async => _read();
+
+  @override
+  Future<Result<List<WorkspaceApiModel>>> getWorkspacesForToken(
+    String authorization,
+  ) async {
+    authorizations.add(authorization);
+    return _read();
+  }
+
+  Future<Result<List<WorkspaceApiModel>>> _read() async {
     getWorkspacesCallCount++;
     final failure = this.failure;
     if (failure != null) return Result.error(failure);

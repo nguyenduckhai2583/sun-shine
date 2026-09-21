@@ -26,7 +26,7 @@ void main() {
     });
 
     test('initSession restores and says so', () async {
-      repository.stored = khai;
+      repository.stored = [khai];
 
       await manager.initSession();
 
@@ -64,8 +64,10 @@ void main() {
     });
 
     test('it passes the active session through', () async {
-      expect(manager.activeSession.map((s) => s?.userId),
-          emitsInOrder([null, 'u1']));
+      expect(
+        manager.activeSession.map((s) => s?.userId),
+        emitsInOrder([null, 'u1']),
+      );
 
       await repository.adoptSession(khai);
     });

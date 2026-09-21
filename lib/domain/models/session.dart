@@ -27,4 +27,11 @@ abstract class Session with _$Session {
   bool get isFullyAuthenticated => !isTmpToken;
 
   bool get needsWorkspace => workspaceId == null;
+
+  /// [expireAt] is an epoch timestamp in seconds, as the backend sends it.
+  bool get isTokenExpired {
+    final expireAt = this.expireAt;
+    if (expireAt == null) return false;
+    return DateTime.now().millisecondsSinceEpoch ~/ 1000 >= expireAt;
+  }
 }

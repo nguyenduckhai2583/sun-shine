@@ -36,7 +36,6 @@ void main() {
       'ChannelApiClient',
       'ChannelLocalService',
       'ChannelRepositoryImpl',
-      'WorkspaceApiClient',
       'WorkspaceRepositoryImpl',
       'HomeViewModel',
       'ChannelsViewModel',

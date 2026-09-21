@@ -166,6 +166,42 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOut;
+
+  /// No description provided for @selectWorkspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Workspace'**
+  String get selectWorkspace;
+
+  /// No description provided for @selectWorkspaceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a workspace to start'**
+  String get selectWorkspaceDesc;
+
+  /// No description provided for @noWorkspaceAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any workspace available. Please contact your administrator.'**
+  String get noWorkspaceAvailable;
+
+  /// No description provided for @couldNotLoadWorkspaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load workspaces'**
+  String get couldNotLoadWorkspaces;
+
   /// No description provided for @somethingWentWrong.
   ///
   /// In en, this message translates to:

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkspaceApiModel {
 
- String get id; String get name;@JsonKey(name: 'badge_count') int get badgeCount;
+ String get id; String get name; bool get isActive;
 /// Create a copy of WorkspaceApiModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WorkspaceApiModelCopyWith<WorkspaceApiModel> get copyWith => _$WorkspaceApiMode
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.badgeCount, badgeCount) || other.badgeCount == badgeCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,badgeCount);
+int get hashCode => Object.hash(runtimeType,id,name,isActive);
 
 @override
 String toString() {
-  return 'WorkspaceApiModel(id: $id, name: $name, badgeCount: $badgeCount)';
+  return 'WorkspaceApiModel(id: $id, name: $name, isActive: $isActive)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WorkspaceApiModelCopyWith<$Res>  {
   factory $WorkspaceApiModelCopyWith(WorkspaceApiModel value, $Res Function(WorkspaceApiModel) _then) = _$WorkspaceApiModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@JsonKey(name: 'badge_count') int badgeCount
+ String id, String name, bool isActive
 });
 
 
@@ -65,12 +65,12 @@ class _$WorkspaceApiModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkspaceApiModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? badgeCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? isActive = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,badgeCount: null == badgeCount ? _self.badgeCount : badgeCount // ignore: cast_nullable_to_non_nullable
-as int,
+as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -155,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'badge_count')  int badgeCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkspaceApiModel() when $default != null:
-return $default(_that.id,_that.name,_that.badgeCount);case _:
+return $default(_that.id,_that.name,_that.isActive);case _:
   return orElse();
 
 }
@@ -176,10 +176,10 @@ return $default(_that.id,_that.name,_that.badgeCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'badge_count')  int badgeCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  bool isActive)  $default,) {final _that = this;
 switch (_that) {
 case _WorkspaceApiModel():
-return $default(_that.id,_that.name,_that.badgeCount);case _:
+return $default(_that.id,_that.name,_that.isActive);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +196,10 @@ return $default(_that.id,_that.name,_that.badgeCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @JsonKey(name: 'badge_count')  int badgeCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  bool isActive)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkspaceApiModel() when $default != null:
-return $default(_that.id,_that.name,_that.badgeCount);case _:
+return $default(_that.id,_that.name,_that.isActive);case _:
   return null;
 
 }
@@ -211,12 +211,12 @@ return $default(_that.id,_that.name,_that.badgeCount);case _:
 @JsonSerializable()
 
 class _WorkspaceApiModel implements WorkspaceApiModel {
-  const _WorkspaceApiModel({required this.id, required this.name, @JsonKey(name: 'badge_count') this.badgeCount = 0});
+  const _WorkspaceApiModel({required this.id, required this.name, this.isActive = true});
   factory _WorkspaceApiModel.fromJson(Map<String, dynamic> json) => _$WorkspaceApiModelFromJson(json);
 
 @override final  String id;
 @override final  String name;
-@override@JsonKey(name: 'badge_count') final  int badgeCount;
+@override@JsonKey() final  bool isActive;
 
 /// Create a copy of WorkspaceApiModel
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.badgeCount, badgeCount) || other.badgeCount == badgeCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,badgeCount);
+int get hashCode => Object.hash(runtimeType,id,name,isActive);
 
 @override
 String toString() {
-  return 'WorkspaceApiModel(id: $id, name: $name, badgeCount: $badgeCount)';
+  return 'WorkspaceApiModel(id: $id, name: $name, isActive: $isActive)';
 }
 
 
@@ -251,7 +251,7 @@ abstract mixin class _$WorkspaceApiModelCopyWith<$Res> implements $WorkspaceApiM
   factory _$WorkspaceApiModelCopyWith(_WorkspaceApiModel value, $Res Function(_WorkspaceApiModel) _then) = __$WorkspaceApiModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@JsonKey(name: 'badge_count') int badgeCount
+ String id, String name, bool isActive
 });
 
 
@@ -268,12 +268,12 @@ class __$WorkspaceApiModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkspaceApiModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? badgeCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? isActive = null,}) {
   return _then(_WorkspaceApiModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,badgeCount: null == badgeCount ? _self.badgeCount : badgeCount // ignore: cast_nullable_to_non_nullable
-as int,
+as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

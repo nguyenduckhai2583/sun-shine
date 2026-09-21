@@ -15,6 +15,11 @@ void main() {
       token: 't1',
       user: User(id: 'u1', email: 'khai@sunshine.com'),
     );
+    const linh = Session(
+      userId: 'u2',
+      token: 't2',
+      user: User(id: 'u2', email: 'linh@sunshine.com'),
+    );
 
     setUp(() {
       localService = AuthLocalService();
@@ -49,7 +54,7 @@ void main() {
         emitsInOrder([null, 'u1', null]),
       );
 
-      repository.adoptSession(khai).then((_) => repository.signOut());
+      repository.adoptSession(khai).then((_) => repository.signOutAll());
     });
 
     test('assignWorkspace updates the active session', () async {
@@ -79,10 +84,74 @@ void main() {
       expect(repository.currentSession?.workspaceId, 'w1');
     });
 
-    test('signOut clears everything', () async {
+    test('sessions lists every signed-in account', () async {
+      await repository.adoptSession(khai);
+      await repository.adoptSession(linh);
+
+      expect(repository.allSessions.map((s) => s.userId), ['u1', 'u2']);
+      expect(repository.currentSession?.userId, 'u2');
+    });
+
+    test('sessionOf reaches a background account', () async {
+      await repository.adoptSession(khai);
+      await repository.adoptSession(linh);
+
+      expect(repository.sessionOf('u1')?.token, 't1');
+      expect(repository.sessionOf('nobody'), isNull);
+    });
+
+    test('setActive changes which account is current', () async {
+      await repository.adoptSession(khai);
+      await repository.adoptSession(linh);
+
+      await repository.setActive('u1');
+
+      expect(repository.currentSession?.userId, 'u1');
+      expect(repository.allSessions, hasLength(2));
+    });
+
+    test('renewToken can renew a background account', () async {
+      await repository.adoptSession(khai);
+      await repository.adoptSession(linh);
+
+      await repository.renewToken(token: 't1-fresh', userId: 'u1');
+
+      expect(repository.sessionOf('u1')?.token, 't1-fresh');
+      expect(repository.currentSession?.userId, 'u2');
+    });
+
+    test('signOutActive promotes the next account', () async {
+      await repository.adoptSession(khai);
+      await repository.adoptSession(linh);
+
+      await repository.signOutActive();
+
+      expect(repository.isSignedIn, isTrue);
+      expect(repository.currentSession?.userId, 'u1');
+    });
+
+    test('signOutActive on the last account signs out for good', () async {
       await repository.adoptSession(khai);
 
-      await repository.signOut();
+      await repository.signOutActive();
+
+      expect(repository.isSignedIn, isFalse);
+    });
+
+    test('removeAccount drops a background account only', () async {
+      await repository.adoptSession(khai);
+      await repository.adoptSession(linh);
+
+      await repository.removeAccount('u1');
+
+      expect(repository.allSessions.map((s) => s.userId), ['u2']);
+      expect(repository.currentSession?.userId, 'u2');
+    });
+
+    test('signOutAll clears everything', () async {
+      await repository.adoptSession(khai);
+
+      await repository.signOutAll();
 
       expect(repository.isSignedIn, isFalse);
       expect(repository.currentSession, isNull);
@@ -119,7 +188,7 @@ void main() {
       final repository = SessionRepositoryImpl(localService: service);
 
       var done = false;
-      unawaited(repository.signOut().then((_) => done = true));
+      unawaited(repository.signOutAll().then((_) => done = true));
       await pumpEventQueue();
       expect(done, isFalse, reason: 'still waiting on storage');
 

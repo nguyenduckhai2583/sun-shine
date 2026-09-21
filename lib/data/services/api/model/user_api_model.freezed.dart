@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserApiModel {
 
- String get id; String get email; String? get fullName; String? get avatar;
+ String get id; String get email; String? get firstName; String? get lastName;/// The wire sends a whole file object here; the app only wants its url.
+@JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson) String? get avatar;
 /// Create a copy of UserApiModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $UserApiModelCopyWith<UserApiModel> get copyWith => _$UserApiModelCopyWithImpl<U
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.avatar, avatar) || other.avatar == avatar));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.avatar, avatar) || other.avatar == avatar));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,fullName,avatar);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,avatar);
 
 @override
 String toString() {
-  return 'UserApiModel(id: $id, email: $email, fullName: $fullName, avatar: $avatar)';
+  return 'UserApiModel(id: $id, email: $email, firstName: $firstName, lastName: $lastName, avatar: $avatar)';
 }
 
 
@@ -48,7 +49,7 @@ abstract mixin class $UserApiModelCopyWith<$Res>  {
   factory $UserApiModelCopyWith(UserApiModel value, $Res Function(UserApiModel) _then) = _$UserApiModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String? fullName, String? avatar
+ String id, String email, String? firstName, String? lastName,@JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson) String? avatar
 });
 
 
@@ -65,11 +66,12 @@ class _$UserApiModelCopyWithImpl<$Res>
 
 /// Create a copy of UserApiModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? fullName = freezed,Object? avatar = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? avatar = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -156,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? fullName,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName, @JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson)  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserApiModel() when $default != null:
-return $default(_that.id,_that.email,_that.fullName,_that.avatar);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.avatar);case _:
   return orElse();
 
 }
@@ -177,10 +179,10 @@ return $default(_that.id,_that.email,_that.fullName,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? fullName,  String? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName, @JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson)  String? avatar)  $default,) {final _that = this;
 switch (_that) {
 case _UserApiModel():
-return $default(_that.id,_that.email,_that.fullName,_that.avatar);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.avatar);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +199,10 @@ return $default(_that.id,_that.email,_that.fullName,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? fullName,  String? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName, @JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson)  String? avatar)?  $default,) {final _that = this;
 switch (_that) {
 case _UserApiModel() when $default != null:
-return $default(_that.id,_that.email,_that.fullName,_that.avatar);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.avatar);case _:
   return null;
 
 }
@@ -211,14 +213,16 @@ return $default(_that.id,_that.email,_that.fullName,_that.avatar);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _UserApiModel implements UserApiModel {
-  const _UserApiModel({required this.id, required this.email, this.fullName, this.avatar});
+class _UserApiModel extends UserApiModel {
+  const _UserApiModel({required this.id, required this.email, this.firstName, this.lastName, @JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson) this.avatar}): super._();
   factory _UserApiModel.fromJson(Map<String, dynamic> json) => _$UserApiModelFromJson(json);
 
 @override final  String id;
 @override final  String email;
-@override final  String? fullName;
-@override final  String? avatar;
+@override final  String? firstName;
+@override final  String? lastName;
+/// The wire sends a whole file object here; the app only wants its url.
+@override@JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson) final  String? avatar;
 
 /// Create a copy of UserApiModel
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.avatar, avatar) || other.avatar == avatar));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.avatar, avatar) || other.avatar == avatar));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,fullName,avatar);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,avatar);
 
 @override
 String toString() {
-  return 'UserApiModel(id: $id, email: $email, fullName: $fullName, avatar: $avatar)';
+  return 'UserApiModel(id: $id, email: $email, firstName: $firstName, lastName: $lastName, avatar: $avatar)';
 }
 
 
@@ -253,7 +257,7 @@ abstract mixin class _$UserApiModelCopyWith<$Res> implements $UserApiModelCopyWi
   factory _$UserApiModelCopyWith(_UserApiModel value, $Res Function(_UserApiModel) _then) = __$UserApiModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String? fullName, String? avatar
+ String id, String email, String? firstName, String? lastName,@JsonKey(fromJson: _avatarFromJson, toJson: _avatarToJson) String? avatar
 });
 
 
@@ -270,11 +274,12 @@ class __$UserApiModelCopyWithImpl<$Res>
 
 /// Create a copy of UserApiModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? fullName = freezed,Object? avatar = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? avatar = freezed,}) {
   return _then(_UserApiModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,fullName: freezed == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

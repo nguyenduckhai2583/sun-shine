@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
 
@@ -6,6 +7,7 @@ Future<void> main() async {
   BuildConfig().setupEnvironment();
   Di.observer = const DiLog();
   DiLog.enabled = BuildConfig().isDebug;
+  LogUtils.init(isDebug: BuildConfig().isDebug);
 
   await AppDatabase.instance.open();
 
@@ -16,26 +18,72 @@ Future<void> main() async {
           create: (context) =>
               AuthManager(baseUrl: BuildConfig().env.baseApiUrl),
         ),
-        Provider(
-          create: (context) => AuthLocalService(),
-          dispose: (context, service) => service.dispose(),
-        ),
+        Provider(create: (context) => AuthLocalService()),
+        Provider(create: (context) => WorkspaceLocalService()),
         Provider<SessionRepository>(
           create: (context) =>
               SessionRepositoryImpl(localService: context.read()),
         ),
+        // Shared authed client: token and workspace header follow whichever
+        // account is active, so every service built on it switches with them.
+        Provider<Dio>(
+          create: (context) => AppDio.create(
+            baseUrl: BuildConfig().env.baseApiUrl,
+            sessionRepository: context.read(),
+          ),
+        ),
+        Provider(create: (context) => WorkspaceApiClient(context.read())),
+        Provider<WorkspaceRepository>(
+          create: (context) => WorkspaceRepositoryImpl(
+            apiClient: context.read(),
+            localService: context.read(),
+          ),
+        ),
         Provider(
-          create: (context) => SessionManager(sessionRepository: context.read()),
-          dispose: (context, manager) => manager.dispose(),
+          create: (context) =>
+              SessionManager(sessionRepository: context.read()),
         ),
         Provider<AuthRepository>(
-          create: (context) => AuthRepositoryImpl(
-            client: AuthApiClient(
-              AppDio.create(
-                baseUrl: BuildConfig().env.baseApiUrl,
-                sessionRepository: context.read(),
-              ),
-            ),
+          create: (context) =>
+              AuthRepositoryImpl(client: AuthApiClient(context.read())),
+        ),
+        Provider(
+          create: (context) => TokenRefreshApiClient(
+            DioFactory.create(baseUrl: BuildConfig().env.baseApiUrl),
+          ),
+        ),
+        Provider(
+          create: (context) => SignInFlowUseCase(authManager: context.read()),
+        ),
+        Provider(
+          create: (context) => SwitchAccountUseCase(
+            sessionRepository: context.read(),
+            workspaceRepository: context.read(),
+            tokenRefreshApiClient: context.read(),
+          ),
+        ),
+        Provider(
+          create: (context) => SelectWorkspaceUseCase(
+            sessionRepository: context.read(),
+            switchAccountUseCase: context.read(),
+          ),
+        ),
+        Provider(
+          create: (context) => WatchAccountsUseCase(
+            sessionRepository: context.read(),
+            workspaceRepository: context.read(),
+          ),
+        ),
+        Provider(
+          create: (context) => RefreshAccountWorkspacesUseCase(
+            sessionRepository: context.read(),
+            workspaceRepository: context.read(),
+          ),
+        ),
+        Provider(
+          create: (context) => SignOutUseCase(
+            sessionRepository: context.read(),
+            workspaceRepository: context.read(),
           ),
         ),
       ],
@@ -59,6 +107,7 @@ class _MainAppState extends State<MainApp> {
     super.initState();
     _router = createRouter(
       sessionManager: context.read<SessionManager>(),
+      signInFlowUseCase: context.read<SignInFlowUseCase>(),
       debugLogDiagnostics: BuildConfig().isDebug,
     );
   }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:sun_shine/core.dart';
 
 class AuthManager {
@@ -14,18 +15,22 @@ class AuthManager {
   late final AuthRepository authRepository;
 
   Session? _pending;
-  bool _isAddingAccount = false;
+  final _isAddingAccount = BehaviorSubject<bool>.seeded(false);
 
   Session? get pending => _pending;
 
-  bool get isAddingAccount => _isAddingAccount;
+  bool get isAddingAccount => _isAddingAccount.value;
+
+  /// Routing listens to this so the sign-in screen can open while another
+  /// account is still signed in.
+  Stream<bool> get addingAccount => _isAddingAccount.stream.distinct();
 
   void setPending(Session session) {
     _pending = session;
     dio.options.headers['Authorization'] = 'Bearer ${session.token}';
   }
 
-  void beginAddAccount() => _isAddingAccount = true;
+  void beginAddAccount() => _isAddingAccount.add(true);
 
   void clearPending() {
     _pending = null;
@@ -34,6 +39,12 @@ class AuthManager {
 
   void reset() {
     clearPending();
-    _isAddingAccount = false;
+    _isAddingAccount.add(false);
+  }
+
+  bool get isDisposed => _isAddingAccount.isClosed;
+
+  void dispose() {
+    _isAddingAccount.close();
   }
 }

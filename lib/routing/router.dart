@@ -14,6 +14,7 @@ final _moreNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'more');
 
 GoRouter createRouter({
   required SessionManager sessionManager,
+  required SignInFlowUseCase signInFlowUseCase,
   String initialLocation = Routes.splash,
   bool debugLogDiagnostics = false,
 }) {
@@ -23,11 +24,16 @@ GoRouter createRouter({
     debugLogDiagnostics: debugLogDiagnostics,
     errorBuilder: (context, state) => ErrorScreen(error: state.error),
     refreshListenable: GoRouterRefreshStream(
-      Rx.merge<dynamic>([sessionManager.activeSession, sessionManager.restored]),
+      Rx.merge<dynamic>([
+        sessionManager.activeSession,
+        sessionManager.restored,
+        signInFlowUseCase.addingAccount,
+      ]),
     ),
     redirect: (context, state) => sessionRedirect(
       session: sessionManager.currentSession,
       isRestored: sessionManager.isRestored,
+      isAddingAccount: signInFlowUseCase.isAddingAccount,
       location: state.matchedLocation,
     ),
     routes: [
@@ -41,16 +47,7 @@ GoRouter createRouter({
       ),
       GoRoute(
         path: Routes.workspace,
-        pageBuilder: (context, state) => _page(
-          state,
-          const Scaffold(
-            body: PlaceholderTab(
-              icon: Icons.workspaces_outline,
-              title: 'Workspace',
-              message: 'Choosing a workspace lands here.',
-            ),
-          ),
-        ),
+        pageBuilder: (context, state) => _page(state, const WorkspaceScreen()),
       ),
       ShellRoute(
         builder: (context, state, child) => MultiProvider(
@@ -151,9 +148,14 @@ String? sessionRedirect({
   required Session? session,
   required bool isRestored,
   required String location,
+  bool isAddingAccount = false,
 }) {
   if (!isRestored) {
     return location == Routes.splash ? null : Routes.splash;
+  }
+  // Adding an account opens sign-in while another account stays signed in.
+  if (isAddingAccount) {
+    return location == Routes.signIn ? null : Routes.signIn;
   }
   if (session == null) {
     return location == Routes.signIn ? null : Routes.signIn;

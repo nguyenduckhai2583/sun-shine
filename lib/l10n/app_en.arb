@@ -13,6 +13,13 @@
   "scanQrCodeAction": "Scan QR code",
   "processing": "Processing",
   "cancel": "Cancel",
+  "next": "Next",
+  "signOut": "Sign out",
+
+  "selectWorkspace": "Select Workspace",
+  "selectWorkspaceDesc": "Please select a workspace to start",
+  "noWorkspaceAvailable": "You don't have any workspace available. Please contact your administrator.",
+  "couldNotLoadWorkspaces": "Could not load workspaces",
 
   "somethingWentWrong": "Something went wrong",
   "noInternetConnection": "No internet connection",
