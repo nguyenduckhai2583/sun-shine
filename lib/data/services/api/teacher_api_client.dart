@@ -1,10 +1,4 @@
-abstract class TeacherApiClient {
-  Future<List<Map<String, Object?>>> fetchTeachers();
-
-  Future<Map<String, Object?>> fetchTeacher(String id);
-}
-
-class FakeTeacherApiClient implements TeacherApiClient {
+class TeacherApiClient {
   static const _teachers = <Map<String, Object?>>[
     {
       'id': 't-1',
@@ -36,10 +30,8 @@ class FakeTeacherApiClient implements TeacherApiClient {
     },
   ];
 
-  @override
   Future<List<Map<String, Object?>>> fetchTeachers() async => _teachers;
 
-  @override
   Future<Map<String, Object?>> fetchTeacher(String id) async =>
       _teachers.firstWhere((teacher) => teacher['id'] == id);
 }

@@ -1,10 +1,6 @@
-abstract class StudentApiClient {
-  Future<List<Map<String, Object?>>> fetchStudents();
-
-  Future<Map<String, Object?>> fetchStudent(String id);
-}
-
-class FakeStudentApiClient implements StudentApiClient {
+/// Fake data, real shape: the client speaks JSON, exactly like a real one
+/// would, so the repository's mapping is the same either way.
+class StudentApiClient {
   static const _students = <Map<String, Object?>>[
     {
       'id': 's-1',
@@ -43,10 +39,8 @@ class FakeStudentApiClient implements StudentApiClient {
     },
   ];
 
-  @override
   Future<List<Map<String, Object?>>> fetchStudents() async => _students;
 
-  @override
   Future<Map<String, Object?>> fetchStudent(String id) async =>
       _students.firstWhere((student) => student['id'] == id);
 }

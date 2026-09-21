@@ -16,4 +16,17 @@ class Student {
   final String email;
   final String className;
   final double gpa;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Student &&
+          other.id == id &&
+          other.name == name &&
+          other.email == email &&
+          other.className == className &&
+          other.gpa == gpa;
+
+  @override
+  int get hashCode => Object.hash(id, name, email, className, gpa);
 }

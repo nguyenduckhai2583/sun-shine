@@ -6,6 +6,7 @@ import '../data/repositories/auth_repository.dart';
 import '../data/repositories/teacher_repository.dart';
 import '../data/repositories/teacher_repository_impl.dart';
 import '../data/services/api/teacher_api_client.dart';
+import '../data/services/local/teacher_local_service.dart';
 import '../ui/auth/widgets/sign_in_screen.dart';
 import '../ui/student/widgets/student_detail_screen.dart';
 import '../ui/student/widgets/students_screen.dart';
@@ -77,13 +78,19 @@ GoRouter createRouter({
     ShellRoute(
       builder: (context, state, child) => MultiProvider(
         providers: [
-          Provider<TeacherApiClient>(
-            create: (context) => FakeTeacherApiClient(),
+          Provider<TeacherApiClient>(create: (context) => TeacherApiClient()),
+          Provider<TeacherLocalService>(
+            create: (context) => TeacherLocalService(),
+            dispose: (context, service) {
+              service.dispose();
+              debugPrint('[teachers] local service disposed');
+            },
           ),
           Provider<TeacherRepository>(
-            create: (context) => TeacherRepositoryImpl(apiClient: context.read()),
-            dispose: (context, repository) =>
-                debugPrint('[teachers] repository disposed'),
+            create: (context) => TeacherRepositoryImpl(
+              apiClient: context.read(),
+              localService: context.read(),
+            ),
           ),
         ],
         child: child,

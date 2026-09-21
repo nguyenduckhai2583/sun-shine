@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/repositories/auth_repository.dart';
+import '../../../domain/models/user.dart';
 import '../../../routing/routes.dart';
 import '../view_models/students_viewmodel.dart';
 
@@ -14,7 +15,8 @@ class StudentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => StudentsViewModel(repository: context.read())..load(),
+      create: (context) =>
+          StudentsViewModel(repository: context.read())..load(),
       child: const _StudentsView(),
     );
   }
@@ -26,9 +28,9 @@ class _StudentsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final students = context.watch<StudentsViewModel>().students;
-    final name = context.select<AuthRepository, String>(
-      (repository) => repository.currentUser?.name ?? '',
-    );
+    // AuthScope puts the session's User in the scope as a plain value, so
+    // the app bar does not need to watch the repository at all.
+    final name = context.watch<User?>()?.name ?? '';
 
     return Scaffold(
       appBar: AppBar(

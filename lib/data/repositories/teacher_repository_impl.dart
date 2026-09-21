@@ -2,25 +2,44 @@ import 'package:flutter/foundation.dart';
 
 import '../../domain/models/teacher.dart';
 import '../services/api/teacher_api_client.dart';
+import '../services/local/teacher_local_service.dart';
 import 'teacher_repository.dart';
 
 class TeacherRepositoryImpl implements TeacherRepository {
-  TeacherRepositoryImpl({required TeacherApiClient apiClient})
-    : _apiClient = apiClient {
+  TeacherRepositoryImpl({
+    required TeacherApiClient apiClient,
+    required TeacherLocalService localService,
+  }) : _apiClient = apiClient,
+       _localService = localService {
     debugPrint('[teachers] repository created');
   }
 
   final TeacherApiClient _apiClient;
+  final TeacherLocalService _localService;
+
+  bool _loadedAll = false;
 
   @override
-  Future<List<Teacher>> getTeachers() async {
+  Stream<List<Teacher>> get teachers => _localService.teachers;
+
+  @override
+  Stream<Teacher?> watchTeacher(String id) => _localService.watch(id);
+
+  @override
+  Future<void> loadTeachers() async {
+    if (_loadedAll) return;
+
     final json = await _apiClient.fetchTeachers();
-    return json.map(_toTeacher).toList();
+    _localService.replaceAll(json.map(_toTeacher).toList());
+    _loadedAll = true;
   }
 
   @override
-  Future<Teacher> getTeacher(String id) async =>
-      _toTeacher(await _apiClient.fetchTeacher(id));
+  Future<void> loadTeacher(String id) async {
+    if (_localService.value.any((teacher) => teacher.id == id)) return;
+
+    _localService.upsert(_toTeacher(await _apiClient.fetchTeacher(id)));
+  }
 
   Teacher _toTeacher(Map<String, Object?> json) => Teacher(
     id: json['id']! as String,

@@ -6,6 +6,7 @@ import 'config/build_config.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/services/api/auth_api_client.dart';
+import 'data/services/local/auth_local_service.dart';
 import 'routing/router.dart';
 import 'ui/auth/widgets/auth_scope.dart';
 
@@ -32,16 +33,23 @@ class SunShineApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Registered by their ABSTRACT type: this is the only place in the
-        // app that names `Fake…`. Point it at a Dio-backed client and no
-        // other file changes.
-        Provider<AuthApiClient>(create: (context) => FakeAuthApiClient()),
+        Provider<AuthApiClient>(create: (context) => AuthApiClient()),
 
-        // A ChangeNotifierProvider because AuthScope and the app bar listen
-        // to it. It reads the client declared above it — order matters
-        // inside a MultiProvider.
-        ChangeNotifierProvider<AuthRepository>(
-          create: (context) => AuthRepositoryImpl(apiClient: context.read()),
+        // The source of truth for the session. It owns a BehaviorSubject, so
+        // it is the one thing here that needs disposing.
+        Provider<AuthLocalService>(
+          create: (context) => AuthLocalService(),
+          dispose: (context, service) => service.dispose(),
+        ),
+
+        // A plain Provider: the repository is not a ChangeNotifier any more,
+        // it exposes Stream<User?>. It reads the two objects declared above
+        // it — order matters inside a MultiProvider.
+        Provider<AuthRepository>(
+          create: (context) => AuthRepositoryImpl(
+            apiClient: context.read(),
+            localService: context.read(),
+          ),
         ),
       ],
       child: const AuthScope(child: _SunShineRouter()),

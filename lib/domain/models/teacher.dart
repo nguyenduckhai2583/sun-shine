@@ -13,4 +13,17 @@ class Teacher {
   final String email;
   final String subject;
   final int yearsOfExperience;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Teacher &&
+          other.id == id &&
+          other.name == name &&
+          other.email == email &&
+          other.subject == subject &&
+          other.yearsOfExperience == yearsOfExperience;
+
+  @override
+  int get hashCode => Object.hash(id, name, email, subject, yearsOfExperience);
 }

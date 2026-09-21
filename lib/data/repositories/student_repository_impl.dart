@@ -2,47 +2,55 @@ import 'package:flutter/foundation.dart';
 
 import '../../domain/models/student.dart';
 import '../services/api/student_api_client.dart';
+import '../services/local/student_local_service.dart';
 import 'student_repository.dart';
 
 class StudentRepositoryImpl implements StudentRepository {
-  StudentRepositoryImpl({required StudentApiClient apiClient})
-    : _apiClient = apiClient;
+  StudentRepositoryImpl({
+    required StudentApiClient apiClient,
+    required StudentLocalService localService,
+  }) : _apiClient = apiClient,
+       _localService = localService;
 
   final StudentApiClient _apiClient;
+  final StudentLocalService _localService;
 
-  /// Per-user state, and the reason this repository lives in the session
-  /// scope. There is deliberately no `clear()`: the cache dies when the
-  /// scope that owns the repository is torn down at sign-out.
-  ///
-  /// Move this provider up to the app scope and the next user inherits this
-  /// list — that is the Compass `UserRepositoryRemote._cachedData` bug.
-  List<Student>? _cache;
+  /// Replaces the old `_cache` field. The cached data now lives in the local
+  /// service; this only remembers whether the full list was fetched.
+  bool _loadedAll = false;
 
   @override
-  Future<List<Student>> getStudents() async {
-    final cache = _cache;
-    if (cache != null) {
-      debugPrint('[students] list      -> cache hit (${cache.length})');
-      return cache;
+  Stream<List<Student>> get students => _localService.students;
+
+  @override
+  Stream<Student?> watchStudent(String id) => _localService.watch(id);
+
+  @override
+  Future<void> loadStudents() async {
+    if (_loadedAll) {
+      debugPrint('[students] list      -> already loaded');
+      return;
     }
 
-    debugPrint('[students] list      -> cache MISS, calling the api');
+    debugPrint('[students] list      -> calling the api');
     final json = await _apiClient.fetchStudents();
-    return _cache = json.map(_toStudent).toList();
+    _localService.replaceAll(json.map(_toStudent).toList());
+    _loadedAll = true;
   }
 
   @override
-  Future<Student> getStudent(String id) async {
-    for (final student in _cache ?? const <Student>[]) {
-      if (student.id == id) {
-        debugPrint('[students] detail $id -> cache hit');
-        return student;
-      }
+  Future<void> loadStudent(String id) async {
+    if (_hasLocally(id)) {
+      debugPrint('[students] detail $id -> already local');
+      return;
     }
 
-    debugPrint('[students] detail $id -> cache MISS, calling the api');
-    return _toStudent(await _apiClient.fetchStudent(id));
+    debugPrint('[students] detail $id -> calling the api');
+    _localService.upsert(_toStudent(await _apiClient.fetchStudent(id)));
   }
+
+  bool _hasLocally(String id) =>
+      _localService.value.any((student) => student.id == id);
 
   Student _toStudent(Map<String, Object?> json) => Student(
     id: json['id']! as String,

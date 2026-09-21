@@ -1,7 +1,11 @@
 import '../../domain/models/teacher.dart';
 
 abstract class TeacherRepository {
-  Future<List<Teacher>> getTeachers();
+  Stream<List<Teacher>> get teachers;
 
-  Future<Teacher> getTeacher(String id);
+  Stream<Teacher?> watchTeacher(String id);
+
+  Future<void> loadTeachers();
+
+  Future<void> loadTeacher(String id);
 }

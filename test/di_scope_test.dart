@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sun_shine/data/repositories/auth_repository.dart';
 import 'package:sun_shine/data/repositories/auth_repository_impl.dart';
 import 'package:sun_shine/data/services/api/auth_api_client.dart';
+import 'package:sun_shine/data/services/local/auth_local_service.dart';
 import 'package:sun_shine/ui/auth/widgets/auth_scope.dart';
 
 /// Pins the two properties `AuthScope` is built on:
@@ -69,11 +70,10 @@ void _selectRebuildTests() {
   testWidgets('signing out rebuilds AuthScope and flips its key', (
     tester,
   ) async {
-    final auth = AuthRepositoryImpl(apiClient: FakeAuthApiClient());
-    addTearDown(auth.dispose);
+    final auth = _repository();
 
     await tester.pumpWidget(
-      ChangeNotifierProvider<AuthRepository>.value(
+      Provider<AuthRepository>.value(
         value: auth,
         child: const AuthScope(child: SizedBox()),
       ),
@@ -81,7 +81,7 @@ void _selectRebuildTests() {
     expect(scope(tester).key, const ValueKey('_anonymous'));
 
     await auth.signIn(email: 'khai@sunshine.edu', password: 'password');
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(
       scope(tester).key,
       const ValueKey('u-1'),
@@ -91,7 +91,7 @@ void _selectRebuildTests() {
     final beforeSignOut = scope(tester);
 
     auth.signOut();
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(
       scope(tester).key,
@@ -107,30 +107,38 @@ void _selectRebuildTests() {
 
   testWidgets('a notification that does not change the user id does not '
       'rebuild AuthScope', (tester) async {
-    final auth = AuthRepositoryImpl(apiClient: FakeAuthApiClient());
-    addTearDown(auth.dispose);
+    final auth = _repository();
 
     await tester.pumpWidget(
-      ChangeNotifierProvider<AuthRepository>.value(
+      Provider<AuthRepository>.value(
         value: auth,
         child: const AuthScope(child: SizedBox()),
       ),
     );
 
     await auth.signIn(email: 'khai@sunshine.edu', password: 'password');
-    await tester.pump();
+    await tester.pumpAndSettle();
     final afterFirstSignIn = scope(tester);
 
-    // Same user signs in again: notifyListeners fires, the id is unchanged.
+    // Same user signs in again: the id is unchanged.
     await auth.signIn(email: 'khai@sunshine.edu', password: 'password');
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(
       identical(afterFirstSignIn, scope(tester)),
       isTrue,
-      reason: 'select filtered the notification out; watch would not have',
+      reason: 'the local service dedupes and .distinct filters on the id',
     );
   });
+}
+
+AuthRepositoryImpl _repository() {
+  final localService = AuthLocalService();
+  addTearDown(localService.dispose);
+  return AuthRepositoryImpl(
+    apiClient: AuthApiClient(),
+    localService: localService,
+  );
 }
 
 /// Stands in for a session-scoped repository.

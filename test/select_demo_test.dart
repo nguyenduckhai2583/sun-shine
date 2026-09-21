@@ -17,7 +17,9 @@ class Session extends ChangeNotifier {
 
   void rename(String userName) {
     name = userName;
-    debugPrint('\n== rename("$userName") -> notifyListeners()   [userId unchanged]');
+    debugPrint(
+      '\n== rename("$userName") -> notifyListeners()   [userId unchanged]',
+    );
     notifyListeners();
   }
 
