@@ -36,10 +36,7 @@ class BuildConfig {
       defaultValue: '1',
     );
     env = Env.fromName(
-      const String.fromEnvironment(
-        'APP_ENVIRONMENT_TYPE',
-        defaultValue: 'dev',
-      ),
+      const String.fromEnvironment('APP_ENVIRONMENT_TYPE', defaultValue: 'dev'),
     );
   }
 }
