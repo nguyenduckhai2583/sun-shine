@@ -21,6 +21,7 @@ export 'services/api/client/refresh_token_interceptor.dart';
 export 'services/api/client/result_call_adapter.dart';
 export 'services/api/model/auth_request.dart';
 export 'services/api/model/channel_api_model.dart';
+export 'services/api/model/channel_request.dart';
 export 'services/api/model/project_api_model.dart';
 export 'services/api/model/session_api_model.dart';
 export 'services/api/model/user_api_model.dart';

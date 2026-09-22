@@ -14,11 +14,13 @@ class AuthScope extends StatelessWidget {
       stream: sessionManager.activeSession,
       initialData: sessionManager.currentSession,
       builder: (context, snapshot) {
+        // Keyed by account only: this scope sits above the router, so keying
+        // it any finer would rebuild GoRouter and its global navigator keys.
         final userId = snapshot.data?.userId ?? '_anonymous';
         return MultiProvider(
           key: ValueKey(userId),
           providers: [
-            Provider(create: (context) => ChannelApiClient()),
+            Provider(create: (context) => ChannelApiClient(context.read())),
             Provider(
               create: (context) => ChannelLocalService(),
               dispose: (context, service) => service.dispose(),

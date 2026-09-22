@@ -6,16 +6,43 @@ import '../../../testing/pump_app.dart';
 
 void main() {
   group('ChannelsScreen', () {
-    testWidgets('renders every channel with its topic and member count', (
-      tester,
-    ) async {
+    testWidgets('renders every channel the workspace has', (tester) async {
       await pumpApp(tester);
 
       expect(find.byType(ListTile), findsNWidgets(4));
       expect(find.text('#general'), findsOneWidget);
       expect(find.text('#random'), findsOneWidget);
-      expect(find.text('Company-wide announcements'), findsOneWidget);
-      expect(find.text('128'), findsOneWidget);
+    });
+
+    testWidgets('a private channel is marked with a lock', (tester) async {
+      await pumpApp(tester);
+
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, '#engineering'),
+          matching: find.byIcon(Icons.lock),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, '#general'),
+          matching: find.byIcon(Icons.tag),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('an encrypted channel carries a shield', (tester) async {
+      await pumpApp(tester);
+
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, '#design'),
+          matching: find.byIcon(Icons.shield_outlined),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('tapping a row opens that channel', (tester) async {
@@ -25,8 +52,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(ChannelDetailScreen), findsOneWidget);
-      expect(find.text('Specs, critique, design system'), findsOneWidget);
-      expect(find.text('17 members'), findsOneWidget);
+      expect(find.text('#design'), findsWidgets);
     });
 
     testWidgets('keeps its scroll state across a tab round trip', (

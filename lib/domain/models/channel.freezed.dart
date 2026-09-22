@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Channel {
 
- String get id; String get name; String get topic; int get memberCount;
+ String get id; String get name; bool get isPrivate; bool get isEncrypted;
 /// Create a copy of Channel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ChannelCopyWith<Channel> get copyWith => _$ChannelCopyWithImpl<Channel>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Channel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Channel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&(identical(other.isEncrypted, isEncrypted) || other.isEncrypted == isEncrypted));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,topic,memberCount);
+int get hashCode => Object.hash(runtimeType,id,name,isPrivate,isEncrypted);
 
 @override
 String toString() {
-  return 'Channel(id: $id, name: $name, topic: $topic, memberCount: $memberCount)';
+  return 'Channel(id: $id, name: $name, isPrivate: $isPrivate, isEncrypted: $isEncrypted)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ChannelCopyWith<$Res>  {
   factory $ChannelCopyWith(Channel value, $Res Function(Channel) _then) = _$ChannelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String topic, int memberCount
+ String id, String name, bool isPrivate, bool isEncrypted
 });
 
 
@@ -62,13 +62,13 @@ class _$ChannelCopyWithImpl<$Res>
 
 /// Create a copy of Channel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? topic = null,Object? memberCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? isPrivate = null,Object? isEncrypted = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,topic: null == topic ? _self.topic : topic // ignore: cast_nullable_to_non_nullable
-as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
-as int,
+as String,isPrivate: null == isPrivate ? _self.isPrivate : isPrivate // ignore: cast_nullable_to_non_nullable
+as bool,isEncrypted: null == isEncrypted ? _self.isEncrypted : isEncrypted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -153,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String topic,  int memberCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  bool isPrivate,  bool isEncrypted)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Channel() when $default != null:
-return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
+return $default(_that.id,_that.name,_that.isPrivate,_that.isEncrypted);case _:
   return orElse();
 
 }
@@ -174,10 +174,10 @@ return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String topic,  int memberCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  bool isPrivate,  bool isEncrypted)  $default,) {final _that = this;
 switch (_that) {
 case _Channel():
-return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
+return $default(_that.id,_that.name,_that.isPrivate,_that.isEncrypted);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +194,10 @@ return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String topic,  int memberCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  bool isPrivate,  bool isEncrypted)?  $default,) {final _that = this;
 switch (_that) {
 case _Channel() when $default != null:
-return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
+return $default(_that.id,_that.name,_that.isPrivate,_that.isEncrypted);case _:
   return null;
 
 }
@@ -209,13 +209,13 @@ return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
 
 
 class _Channel extends Channel {
-  const _Channel({required this.id, required this.name, this.topic = '', this.memberCount = 0}): super._();
+  const _Channel({required this.id, required this.name, this.isPrivate = false, this.isEncrypted = false}): super._();
   
 
 @override final  String id;
 @override final  String name;
-@override@JsonKey() final  String topic;
-@override@JsonKey() final  int memberCount;
+@override@JsonKey() final  bool isPrivate;
+@override@JsonKey() final  bool isEncrypted;
 
 /// Create a copy of Channel
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +227,16 @@ _$ChannelCopyWith<_Channel> get copyWith => __$ChannelCopyWithImpl<_Channel>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Channel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Channel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&(identical(other.isEncrypted, isEncrypted) || other.isEncrypted == isEncrypted));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,topic,memberCount);
+int get hashCode => Object.hash(runtimeType,id,name,isPrivate,isEncrypted);
 
 @override
 String toString() {
-  return 'Channel(id: $id, name: $name, topic: $topic, memberCount: $memberCount)';
+  return 'Channel(id: $id, name: $name, isPrivate: $isPrivate, isEncrypted: $isEncrypted)';
 }
 
 
@@ -247,7 +247,7 @@ abstract mixin class _$ChannelCopyWith<$Res> implements $ChannelCopyWith<$Res> {
   factory _$ChannelCopyWith(_Channel value, $Res Function(_Channel) _then) = __$ChannelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String topic, int memberCount
+ String id, String name, bool isPrivate, bool isEncrypted
 });
 
 
@@ -264,13 +264,13 @@ class __$ChannelCopyWithImpl<$Res>
 
 /// Create a copy of Channel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? topic = null,Object? memberCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? isPrivate = null,Object? isEncrypted = null,}) {
   return _then(_Channel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,topic: null == topic ? _self.topic : topic // ignore: cast_nullable_to_non_nullable
-as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
-as int,
+as String,isPrivate: null == isPrivate ? _self.isPrivate : isPrivate // ignore: cast_nullable_to_non_nullable
+as bool,isEncrypted: null == isEncrypted ? _self.isEncrypted : isEncrypted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

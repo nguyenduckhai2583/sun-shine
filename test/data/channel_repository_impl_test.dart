@@ -34,11 +34,15 @@ void main() {
       expect(result, isA<Error<Channel>>());
     });
 
-    test('loadChannels caches the list', () async {
+    test('every list read asks the service', () async {
       await repository.loadChannels();
       await repository.loadChannels();
 
-      expect(apiClient.getChannelsCallCount, 1);
+      expect(
+        apiClient.getChannelsCallCount,
+        2,
+        reason: 'the workspace may have changed under us between reads',
+      );
     });
 
     test('a list read warms the per-id cache', () async {
@@ -47,18 +51,10 @@ void main() {
 
       expect(result, isA<Ok<Channel>>());
       expect(
-        apiClient.getChannelCallCount,
-        0,
+        apiClient.getChannelsCallCount,
+        1,
         reason: 'served from the local service, no second round trip',
       );
-    });
-
-    test('invalidateCache forces a refetch', () async {
-      await repository.loadChannels();
-      repository.invalidateCache();
-      await repository.loadChannels();
-
-      expect(apiClient.getChannelsCallCount, 2);
     });
 
     test('the channels stream emits on load', () async {

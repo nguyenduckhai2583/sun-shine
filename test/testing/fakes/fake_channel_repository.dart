@@ -5,18 +5,12 @@ class FakeChannelRepository implements ChannelRepository {
   FakeChannelRepository({List<Channel>? channels, this.failure})
     : _seed = channels ?? defaultChannels;
 
-  static const defaultChannel = Channel(
-    id: 'general',
-    name: 'general',
-    topic: 'Company-wide announcements',
-    memberCount: 128,
-  );
+  static const defaultChannel = Channel(id: 'general', name: 'general');
 
   static const secondChannel = Channel(
     id: 'engineering',
     name: 'engineering',
-    topic: 'Builds, reviews, incidents',
-    memberCount: 42,
+    isPrivate: true,
   );
 
   static const defaultChannels = [defaultChannel, secondChannel];
@@ -27,6 +21,7 @@ class FakeChannelRepository implements ChannelRepository {
   Exception? failure;
   Exception? renameFailure;
 
+  int loadCallCount = 0;
   final requestedIds = <String>[];
   final renameCalls = <(String, String)>[];
 
@@ -39,6 +34,7 @@ class FakeChannelRepository implements ChannelRepository {
 
   @override
   Future<Result<List<Channel>>> loadChannels() async {
+    loadCallCount++;
     final failure = this.failure;
     if (failure != null) {
       return Result.error(failure);
@@ -86,9 +82,6 @@ class FakeChannelRepository implements ChannelRepository {
     _localService.upsert(renamed);
     return Result.ok(renamed);
   }
-
-  @override
-  void invalidateCache() => _localService.clear();
 
   void dispose() => _localService.dispose();
 }

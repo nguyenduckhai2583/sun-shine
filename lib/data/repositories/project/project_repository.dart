@@ -10,6 +10,4 @@ abstract class ProjectRepository {
   Future<Result<Project>> loadProject(String projectId);
 
   Future<Result<Project>> updateProjectName(String projectId, String name);
-
-  void invalidateCache();
 }

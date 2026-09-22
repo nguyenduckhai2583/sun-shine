@@ -69,6 +69,10 @@ Future<void> main() async {
           ),
         ),
         Provider(
+          create: (context) =>
+              WatchActiveWorkspaceUseCase(sessionRepository: context.read()),
+        ),
+        Provider(
           create: (context) => WatchAccountsUseCase(
             sessionRepository: context.read(),
             workspaceRepository: context.read(),

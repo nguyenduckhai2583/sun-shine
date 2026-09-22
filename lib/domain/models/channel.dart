@@ -9,8 +9,8 @@ abstract class Channel with _$Channel {
   const factory Channel({
     required String id,
     required String name,
-    @Default('') String topic,
-    @Default(0) int memberCount,
+    @Default(false) bool isPrivate,
+    @Default(false) bool isEncrypted,
   }) = _Channel;
 
   String get displayName => '#$name';

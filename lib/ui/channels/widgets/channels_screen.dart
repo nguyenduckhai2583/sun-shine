@@ -9,8 +9,10 @@ class ChannelsScreen extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) =>
-              ChannelsViewModel(channelRepository: context.read()),
+          create: (context) => ChannelsViewModel(
+            channelRepository: context.read(),
+            watchActiveWorkspaceUseCase: context.read(),
+          ),
         ),
       ],
       child: const _ChannelsView(),
@@ -86,16 +88,16 @@ class _ChannelTile extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: theme.colorScheme.surfaceContainerHighest,
         foregroundColor: theme.colorScheme.onSurfaceVariant,
-        child: const Icon(Icons.tag, size: 18),
+        child: Icon(channel.isPrivate ? Icons.lock : Icons.tag, size: 18),
       ),
       title: Text(channel.displayName),
-      subtitle: channel.topic.isEmpty
-          ? null
-          : Text(channel.topic, maxLines: 1, overflow: TextOverflow.ellipsis),
-      trailing: Text(
-        '${channel.memberCount}',
-        style: theme.textTheme.labelMedium,
-      ),
+      trailing: channel.isEncrypted
+          ? Icon(
+              Icons.shield_outlined,
+              size: 18,
+              color: theme.colorScheme.onSurfaceVariant,
+            )
+          : null,
     );
   }
 }

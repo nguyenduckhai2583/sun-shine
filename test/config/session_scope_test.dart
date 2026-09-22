@@ -18,7 +18,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final fromDetail = tester
-        .element(find.text('128 members'))
+        .element(find.byType(ChannelDetailScreen))
         .read<ChannelRepository>();
 
     expect(

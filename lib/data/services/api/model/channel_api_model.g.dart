@@ -9,15 +9,15 @@ part of 'channel_api_model.dart';
 _ChannelApiModel _$ChannelApiModelFromJson(Map<String, dynamic> json) =>
     _ChannelApiModel(
       id: json['id'] as String,
-      name: json['name'] as String,
-      topic: json['topic'] as String? ?? '',
-      memberCount: (json['member_count'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String?,
+      isPrivate: json['isPrivate'] as bool? ?? false,
+      isEncrypted: json['isEncrypted'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ChannelApiModelToJson(_ChannelApiModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'topic': instance.topic,
-      'member_count': instance.memberCount,
+      'isPrivate': instance.isPrivate,
+      'isEncrypted': instance.isEncrypted,
     };

@@ -10,4 +10,5 @@ export 'use_cases/auth/sign_out_use_case.dart';
 export 'use_cases/auth/switch_account_use_case.dart';
 export 'use_cases/workspace/refresh_account_workspaces_use_case.dart';
 export 'use_cases/workspace/select_workspace_use_case.dart';
+export 'use_cases/workspace/watch_active_workspace_use_case.dart';
 export 'use_cases/workspace/watch_accounts_use_case.dart';

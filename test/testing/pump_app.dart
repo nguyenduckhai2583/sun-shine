@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sun_shine/core.dart';
@@ -13,6 +16,7 @@ Future<SessionRepository> pumpApp(
   FakeAuthApiClient? authApi,
   WorkspaceApiClient? workspaceApi,
   FakeTokenRefreshApiClient? tokenRefreshApi,
+  StubHttpAdapter? httpAdapter,
 }) async {
   BuildConfig().setupEnvironment();
 
@@ -25,6 +29,11 @@ Future<SessionRepository> pumpApp(
     apiClient: workspaceApi ?? FakeWorkspaceApiClient(),
     localService: workspaceLocalService,
   );
+  // The real authed client, so tests see the same headers production sends.
+  final dio = AppDio.create(
+    baseUrl: 'https://test.invalid',
+    sessionRepository: sessionRepository,
+  )..httpClientAdapter = httpAdapter ?? StubHttpAdapter();
   final sessionManager = SessionManager(sessionRepository: sessionRepository);
   final authManager = AuthManager(
     baseUrl: 'https://test.invalid/',
@@ -45,6 +54,7 @@ Future<SessionRepository> pumpApp(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        Provider<Dio>(create: (context) => dio),
         Provider(create: (context) => authManager),
         Provider<AuthRepository>(
           create: (context) => AuthRepositoryImpl(client: FakeAuthApiClient()),
@@ -61,6 +71,10 @@ Future<SessionRepository> pumpApp(
             sessionRepository: sessionRepository,
             switchAccountUseCase: switchAccountUseCase,
           ),
+        ),
+        Provider(
+          create: (context) =>
+              WatchActiveWorkspaceUseCase(sessionRepository: sessionRepository),
         ),
         Provider(
           create: (context) => WatchAccountsUseCase(
@@ -151,4 +165,45 @@ class _TestAppState extends State<_TestApp> {
     supportedLocales: AppLocalizations.supportedLocales,
     routerConfig: _router,
   );
+}
+
+/// Serves canned bodies to whatever the session scope builds on the shared
+/// [Dio], so widget tests exercise the real client and repository without a
+/// network.
+class StubHttpAdapter implements HttpClientAdapter {
+  StubHttpAdapter({Map<String, String>? bodies, this.status = 200})
+    : bodies = bodies ?? {...defaultBodies};
+
+  static const channelsBody =
+      '[{"id":"general","name":"general"},'
+      '{"id":"engineering","name":"engineering","isPrivate":true},'
+      '{"id":"design","name":"design","isEncrypted":true},'
+      '{"id":"random","name":"random"}]';
+
+  static const defaultBodies = {'/chat-services/channels': channelsBody};
+
+  final Map<String, String> bodies;
+  int status;
+
+  final List<RequestOptions> requests = [];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requests.add(options);
+    final body = bodies[options.uri.path] ?? '{}';
+    return ResponseBody.fromString(
+      body,
+      status,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }

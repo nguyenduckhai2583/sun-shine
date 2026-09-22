@@ -67,12 +67,6 @@ class ProjectRepositoryImpl extends BaseRepo implements ProjectRepository {
     }
   }
 
-  @override
-  void invalidateCache() {
-    _loadedAll = false;
-    _localService.clear();
-  }
-
   Project _toDomain(ProjectApiModel model) {
     return Project(
       id: model.id,

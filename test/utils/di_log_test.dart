@@ -33,7 +33,6 @@ void main() {
       'AuthLocalService',
       'AuthRepositoryImpl',
       'SessionRepositoryImpl',
-      'ChannelApiClient',
       'ChannelLocalService',
       'ChannelRepositoryImpl',
       'WorkspaceRepositoryImpl',

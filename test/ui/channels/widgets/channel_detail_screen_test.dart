@@ -13,8 +13,7 @@ void main() {
 
       expect(find.byType(ChannelDetailScreen), findsOneWidget);
       expect(find.text('#general'), findsWidgets);
-      expect(find.text('Company-wide announcements'), findsOneWidget);
-      expect(find.text('128 members'), findsOneWidget);
+      expect(find.text('Public channel'), findsOneWidget);
     });
 
     testWidgets('loads a different channel from the same route', (
@@ -25,8 +24,8 @@ void main() {
         initialLocation: Routes.channelDetail('engineering'),
       );
 
-      expect(find.text('Builds, reviews, incidents'), findsOneWidget);
-      expect(find.text('42 members'), findsOneWidget);
+      expect(find.text('#engineering'), findsWidgets);
+      expect(find.text('Private channel'), findsOneWidget);
     });
 
     testWidgets('shows retry when the channel does not exist', (tester) async {
@@ -41,7 +40,7 @@ void main() {
       await tester.tap(find.widgetWithText(ListTile, '#general'));
       await tester.pumpAndSettle();
 
-      final context = tester.element(find.text('128 members'));
+      final context = tester.element(find.text('Public channel'));
       expect(context.read<ChannelDetailViewModel>().channelId, 'general');
       expect(
         () => context.read<HomeViewModel>(),

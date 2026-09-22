@@ -125,22 +125,25 @@ class _ChannelBody extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.tag, size: 56, color: theme.colorScheme.primary),
+            Icon(
+              channel.isPrivate ? Icons.lock : Icons.tag,
+              size: 56,
+              color: theme.colorScheme.primary,
+            ),
             const SizedBox(height: 16),
             Text(channel.displayName, style: theme.textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(
-              channel.topic,
+              channel.isPrivate ? 'Private channel' : 'Public channel',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${channel.memberCount} members',
-              style: theme.textTheme.labelMedium,
-            ),
+            if (channel.isEncrypted) ...[
+              const SizedBox(height: 8),
+              Text('End-to-end encrypted', style: theme.textTheme.labelMedium),
+            ],
           ],
         ),
       ),

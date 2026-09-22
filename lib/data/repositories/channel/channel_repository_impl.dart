@@ -10,8 +10,6 @@ class ChannelRepositoryImpl extends BaseRepo implements ChannelRepository {
   final ChannelApiClient _apiClient;
   final ChannelLocalService _localService;
 
-  bool _loadedAll = false;
-
   @override
   Stream<List<Channel>> get channels => _localService.channels;
 
@@ -21,34 +19,32 @@ class ChannelRepositoryImpl extends BaseRepo implements ChannelRepository {
 
   @override
   Future<Result<List<Channel>>> loadChannels() async {
-    if (_loadedAll) return Result.ok(_localService.value);
-
     final result = await _apiClient.getChannels();
     switch (result) {
       case Ok<List<ChannelApiModel>>():
         final channels = result.value.map(_toDomain).toList();
         _localService.replaceAll(channels);
-        _loadedAll = true;
         return Result.ok(channels);
       case Error<List<ChannelApiModel>>():
         return Result.error(result.error);
     }
   }
 
+  /// The service has no endpoint for a single channel, so a miss is answered
+  /// by loading the list and looking again.
   @override
   Future<Result<Channel>> loadChannel(String channelId) async {
     final cached = _localService.channelById(channelId);
     if (cached != null) return Result.ok(cached);
 
-    final result = await _apiClient.getChannel(channelId);
-    switch (result) {
-      case Ok<ChannelApiModel>():
-        final channel = _toDomain(result.value);
-        _localService.upsert(channel);
-        return Result.ok(channel);
-      case Error<ChannelApiModel>():
-        return Result.error(result.error);
+    final loaded = await loadChannels();
+    if (loaded case Error(:final error)) return Result.error(error);
+
+    final channel = _localService.channelById(channelId);
+    if (channel == null) {
+      return Result.error(ChannelNotFoundException(channelId));
     }
+    return Result.ok(channel);
   }
 
   @override
@@ -56,29 +52,38 @@ class ChannelRepositoryImpl extends BaseRepo implements ChannelRepository {
     String channelId,
     String name,
   ) async {
-    final result = await _apiClient.updateChannelName(channelId, name);
+    final trimmed = name.trim();
+    if (trimmed.isEmpty || trimmed.contains(' ')) {
+      return Result.error(InvalidChannelNameException(name));
+    }
+
+    final current = _localService.channelById(channelId);
+    if (current == null) {
+      return Result.error(ChannelNotFoundException(channelId));
+    }
+
+    final result = await _apiClient.updateChannel(
+      channelId,
+      ChannelUpdateRequest(name: trimmed),
+    );
     switch (result) {
-      case Ok<ChannelApiModel>():
-        final channel = _toDomain(result.value);
-        _localService.upsert(channel);
-        return Result.ok(channel);
-      case Error<ChannelApiModel>():
+      case Ok<void>():
+        // The service answers with an empty body, so the rename is applied to
+        // the copy we already hold.
+        final renamed = current.copyWith(name: trimmed);
+        _localService.upsert(renamed);
+        return Result.ok(renamed);
+      case Error<void>():
         return Result.error(result.error);
     }
-  }
-
-  @override
-  void invalidateCache() {
-    _loadedAll = false;
-    _localService.clear();
   }
 
   Channel _toDomain(ChannelApiModel model) {
     return Channel(
       id: model.id,
-      name: model.name,
-      topic: model.topic,
-      memberCount: model.memberCount,
+      name: model.name ?? '',
+      isPrivate: model.isPrivate,
+      isEncrypted: model.isEncrypted,
     );
   }
 }

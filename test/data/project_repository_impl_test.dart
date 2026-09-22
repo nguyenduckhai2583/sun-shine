@@ -77,16 +77,5 @@ void main() {
         isA<InvalidProjectNameException>(),
       );
     });
-
-    test('invalidateCache empties the store and allows a refetch', () async {
-      await repository.loadProjects();
-      expect(localService.value, hasLength(3));
-
-      repository.invalidateCache();
-      expect(localService.value, isEmpty);
-
-      await repository.loadProjects();
-      expect(localService.value, hasLength(3));
-    });
   });
 }

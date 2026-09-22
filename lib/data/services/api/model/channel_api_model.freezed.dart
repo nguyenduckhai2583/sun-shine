@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChannelApiModel {
 
- String get id; String get name; String get topic;@JsonKey(name: 'member_count') int get memberCount;
+ String get id; String? get name; bool get isPrivate; bool get isEncrypted;
 /// Create a copy of ChannelApiModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ChannelApiModelCopyWith<ChannelApiModel> get copyWith => _$ChannelApiModelCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChannelApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChannelApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&(identical(other.isEncrypted, isEncrypted) || other.isEncrypted == isEncrypted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,topic,memberCount);
+int get hashCode => Object.hash(runtimeType,id,name,isPrivate,isEncrypted);
 
 @override
 String toString() {
-  return 'ChannelApiModel(id: $id, name: $name, topic: $topic, memberCount: $memberCount)';
+  return 'ChannelApiModel(id: $id, name: $name, isPrivate: $isPrivate, isEncrypted: $isEncrypted)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ChannelApiModelCopyWith<$Res>  {
   factory $ChannelApiModelCopyWith(ChannelApiModel value, $Res Function(ChannelApiModel) _then) = _$ChannelApiModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String topic,@JsonKey(name: 'member_count') int memberCount
+ String id, String? name, bool isPrivate, bool isEncrypted
 });
 
 
@@ -65,13 +65,13 @@ class _$ChannelApiModelCopyWithImpl<$Res>
 
 /// Create a copy of ChannelApiModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? topic = null,Object? memberCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? isPrivate = null,Object? isEncrypted = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,topic: null == topic ? _self.topic : topic // ignore: cast_nullable_to_non_nullable
-as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
-as int,
+as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,isPrivate: null == isPrivate ? _self.isPrivate : isPrivate // ignore: cast_nullable_to_non_nullable
+as bool,isEncrypted: null == isEncrypted ? _self.isEncrypted : isEncrypted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -156,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String topic, @JsonKey(name: 'member_count')  int memberCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  bool isPrivate,  bool isEncrypted)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChannelApiModel() when $default != null:
-return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
+return $default(_that.id,_that.name,_that.isPrivate,_that.isEncrypted);case _:
   return orElse();
 
 }
@@ -177,10 +177,10 @@ return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String topic, @JsonKey(name: 'member_count')  int memberCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  bool isPrivate,  bool isEncrypted)  $default,) {final _that = this;
 switch (_that) {
 case _ChannelApiModel():
-return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
+return $default(_that.id,_that.name,_that.isPrivate,_that.isEncrypted);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +197,10 @@ return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String topic, @JsonKey(name: 'member_count')  int memberCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  bool isPrivate,  bool isEncrypted)?  $default,) {final _that = this;
 switch (_that) {
 case _ChannelApiModel() when $default != null:
-return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
+return $default(_that.id,_that.name,_that.isPrivate,_that.isEncrypted);case _:
   return null;
 
 }
@@ -212,13 +212,13 @@ return $default(_that.id,_that.name,_that.topic,_that.memberCount);case _:
 @JsonSerializable()
 
 class _ChannelApiModel implements ChannelApiModel {
-  const _ChannelApiModel({required this.id, required this.name, this.topic = '', @JsonKey(name: 'member_count') this.memberCount = 0});
+  const _ChannelApiModel({required this.id, this.name, this.isPrivate = false, this.isEncrypted = false});
   factory _ChannelApiModel.fromJson(Map<String, dynamic> json) => _$ChannelApiModelFromJson(json);
 
 @override final  String id;
-@override final  String name;
-@override@JsonKey() final  String topic;
-@override@JsonKey(name: 'member_count') final  int memberCount;
+@override final  String? name;
+@override@JsonKey() final  bool isPrivate;
+@override@JsonKey() final  bool isEncrypted;
 
 /// Create a copy of ChannelApiModel
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChannelApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChannelApiModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&(identical(other.isEncrypted, isEncrypted) || other.isEncrypted == isEncrypted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,topic,memberCount);
+int get hashCode => Object.hash(runtimeType,id,name,isPrivate,isEncrypted);
 
 @override
 String toString() {
-  return 'ChannelApiModel(id: $id, name: $name, topic: $topic, memberCount: $memberCount)';
+  return 'ChannelApiModel(id: $id, name: $name, isPrivate: $isPrivate, isEncrypted: $isEncrypted)';
 }
 
 
@@ -253,7 +253,7 @@ abstract mixin class _$ChannelApiModelCopyWith<$Res> implements $ChannelApiModel
   factory _$ChannelApiModelCopyWith(_ChannelApiModel value, $Res Function(_ChannelApiModel) _then) = __$ChannelApiModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String topic,@JsonKey(name: 'member_count') int memberCount
+ String id, String? name, bool isPrivate, bool isEncrypted
 });
 
 
@@ -270,13 +270,13 @@ class __$ChannelApiModelCopyWithImpl<$Res>
 
 /// Create a copy of ChannelApiModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? topic = null,Object? memberCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? isPrivate = null,Object? isEncrypted = null,}) {
   return _then(_ChannelApiModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,topic: null == topic ? _self.topic : topic // ignore: cast_nullable_to_non_nullable
-as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
-as int,
+as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,isPrivate: null == isPrivate ? _self.isPrivate : isPrivate // ignore: cast_nullable_to_non_nullable
+as bool,isEncrypted: null == isEncrypted ? _self.isEncrypted : isEncrypted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

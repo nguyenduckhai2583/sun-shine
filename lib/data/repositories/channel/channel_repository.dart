@@ -10,6 +10,4 @@ abstract class ChannelRepository {
   Future<Result<Channel>> loadChannel(String channelId);
 
   Future<Result<Channel>> updateChannelName(String channelId, String name);
-
-  void invalidateCache();
 }
